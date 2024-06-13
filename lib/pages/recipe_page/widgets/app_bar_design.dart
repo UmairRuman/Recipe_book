@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
 
 class RecipeAppBarDesign extends StatelessWidget {
   const RecipeAppBarDesign({super.key});
@@ -6,6 +8,7 @@ class RecipeAppBarDesign extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final recipeController = Get.put(RecipeController());
         final borderRadius = Radius.circular(constraints.maxWidth * 0.15);
         return Container(
           width: constraints.maxWidth,
@@ -29,8 +32,16 @@ class RecipeAppBarDesign extends StatelessWidget {
             child: ButtonBar(
               children: [
                 IconButton(
-                    onPressed: () {
-                      //set timer
+                    onPressed: () async {
+                      var time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                        initialEntryMode: TimePickerEntryMode.dialOnly,
+                      );
+                      if (time != null) {
+                        recipeController.scheduleNotification(
+                            time, 'Fish taco timer up');
+                      }
                     },
                     icon: const Icon(
                       Icons.timer_outlined,
