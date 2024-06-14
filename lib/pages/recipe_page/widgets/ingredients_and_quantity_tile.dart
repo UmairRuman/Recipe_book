@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class IngredientsQuantityTile extends StatelessWidget {
-  const IngredientsQuantityTile({super.key});
-
+  const IngredientsQuantityTile(
+      {super.key, required this.ingredient, required this.quantity});
+  final String ingredient, quantity;
   @override
   Widget build(BuildContext context) {
     final Size(:height) = MediaQuery.sizeOf(context);
@@ -10,11 +11,11 @@ class IngredientsQuantityTile extends StatelessWidget {
     return Material(
       child: ListTile(
         leading: Text(
-          'Lemon',
+          ingredient,
           style: style,
         ),
         trailing: Text(
-          '1 tbs',
+          quantity,
           style: style,
         ),
       ),

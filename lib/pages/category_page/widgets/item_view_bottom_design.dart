@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/get_instance.dart';
+import 'package:get/get.dart';
 import 'package:recipe_book/pages/category_page/controller/category_controller.dart';
 
-class CategoryIetmViewBottomDesign extends StatelessWidget {
-  const CategoryIetmViewBottomDesign({
+class CategoryItemViewBottomDesign extends GetView<CategoryController> {
+  const CategoryItemViewBottomDesign({
     super.key,
     required this.recipeDetail,
+    required this.recipeName,
   });
-  final String recipeDetail;
+  final String recipeDetail, recipeName;
   static const btnText = 'See full recipe';
   static const maxTextLines = 4;
   static const recipePaddingFromLeft = 0.08;
   static const btnPaddingFromRight = 0.05;
   static const btnPaddingFromBottom = 0.1;
+
+  void _onBtnTap() {
+    controller.navigateToRecipePage(mealName: recipeName);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final categoryController = Get.put(CategoryController());
     final recipeDetailStyle = TextStyle(
       color: Colors.grey.shade400,
     );
@@ -49,7 +53,7 @@ class CategoryIetmViewBottomDesign extends StatelessWidget {
                       right: constraints.maxWidth * btnPaddingFromRight),
                   child: FittedBox(
                     child: TextButton(
-                      onPressed: categoryController.navigateToRecipePage,
+                      onPressed: _onBtnTap,
                       child: const Text(btnText),
                     ),
                   ),

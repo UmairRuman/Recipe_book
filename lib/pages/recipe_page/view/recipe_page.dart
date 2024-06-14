@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
+import 'package:recipe_book/pages/recipe_page/model/meals_api_model.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/app_bar_design.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/ingredeints_quantity_list.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/ingredient_and_quantity_design.dart';
@@ -6,11 +9,13 @@ import 'package:recipe_book/pages/recipe_page/widgets/recipe_tutorial_design.dar
 
 class RecipePage extends StatelessWidget {
   const RecipePage({super.key});
-  static const pageName = '/recipe';
+  static const pageAddress = '/recipe';
   static const instructions = 'Instructions :';
   static const originalRecipeLink = 'Recipe link :';
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(RecipeController());
+    final MealsModel meal = Get.arguments;
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final style = TextStyle(
       color: Colors.black,
@@ -25,11 +30,15 @@ class RecipePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const RecipeAndTutorialDesign(
-              recipeName: 'Spicy Arrabiata Penne',
+            RecipeAndTutorialDesign(
+              recipeName: meal.strMeal,
+              videoUrl: meal.strYoutube,
             ),
             const IngredientAndQuantityHeadings(),
-            const IngredientsQuantityList(),
+            IngredientsQuantityList(
+              ingredientsAndQuantityList:
+                  controller.ingredientsAndQuantityList(meal.toMap()),
+            ),
             Padding(
               padding: EdgeInsets.only(left: width * 0.07),
               child: Text(
@@ -41,33 +50,34 @@ class RecipePage extends StatelessWidget {
               padding: EdgeInsets.only(left: width * 0.07),
               child: SizedBox(
                 width: width * 0.8,
-                child: const Text(
-                    'In this recipe we will be going to make fish tacos and now we will tak a fish and a tco and now we have a taco fish.Now go and make your fish tacoa and ow i am going to finish this ui and then go to slppe and gaian work on this in the morining'),
+                child: Text(
+                  meal.strInstructions,
+                ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(
-                  left: width * 0.07,
-                  top: height * 0.02,
-                  bottom: height * 0.02),
-              child: SizedBox(
-                width: width * 0.85,
-                child: RichText(
-                    text: const TextSpan(children: [
-                  TextSpan(
-                    text: '\u{1F517}',
-                  ),
-                  TextSpan(
-                      text:
-                          'https://www.bbcgoodfood.com/recipes/3028701/threecheese-souffls',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.blue,
-                      ))
-                ])),
-              ),
-            )
+            if (meal.strSource.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(
+                    left: width * 0.07,
+                    top: height * 0.02,
+                    bottom: height * 0.02),
+                child: SizedBox(
+                  width: width * 0.85,
+                  child: RichText(
+                      text: TextSpan(children: [
+                    const TextSpan(
+                      text: '\u{1F517}',
+                    ),
+                    TextSpan(
+                        text: meal.strSource,
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.blue,
+                        ))
+                  ])),
+                ),
+              )
           ],
         ),
       ),

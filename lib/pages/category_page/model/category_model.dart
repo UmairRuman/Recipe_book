@@ -26,7 +26,7 @@ const categoriesDummyList = [
           'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
       recipeDetail:
           'In this recipe we will be going to make fish tacos and now we will tak a fish and a tco and now we have a taco fish.Now go and make your fish taco',
-      recipeName: 'fish tacos'),
+      recipeName: 'Arrabiata'),
   CategoryModel(
       image:
           'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RecipeAndTutorialDesign extends StatelessWidget {
-  const RecipeAndTutorialDesign({super.key, required this.recipeName});
-  final String recipeName;
+  const RecipeAndTutorialDesign(
+      {super.key, required this.recipeName, required this.videoUrl});
+  final String recipeName, videoUrl;
   static const recipe = 'Recipe :  ';
   static const tutorial = 'Watch Video';
   @override
@@ -28,7 +30,13 @@ class RecipeAndTutorialDesign extends StatelessWidget {
           Expanded(
               flex: 1,
               child: TextButton(
-                onPressed: () {},
+                onPressed: () async {
+                  Uri uri = Uri.parse(videoUrl);
+                  if (!await launchUrl(uri)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('No Video Available')));
+                  }
+                },
                 child: const Text(
                   tutorial,
                   style: TextStyle(

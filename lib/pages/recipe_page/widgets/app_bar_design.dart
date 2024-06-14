@@ -8,7 +8,7 @@ class RecipeAppBarDesign extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final recipeController = Get.put(RecipeController());
+        final recipeController = Get.find<RecipeController>();
         final borderRadius = Radius.circular(constraints.maxWidth * 0.15);
         return Container(
           width: constraints.maxWidth,

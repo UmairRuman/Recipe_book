@@ -79,7 +79,8 @@ class CategoryItemView extends StatelessWidget {
                 flex: 2,
                 child: Align(
                   alignment: Alignment.topCenter,
-                  child: CategoryIetmViewBottomDesign(
+                  child: CategoryItemViewBottomDesign(
+                    recipeName: category.recipeName,
                     recipeDetail: category.recipeDetail,
                   ),
                 )),
