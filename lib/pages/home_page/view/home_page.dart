@@ -15,18 +15,19 @@ class HomePage extends GetView<HomePageController> {
     final searchBarHeight = height * 0.1;
     final categoryItemHeight = height * 0.25;
     final favouriteReciepeItemHeight = height * 0.25;
-    final cacheReceipeItemHeight = height * 0.20;
+    final cacheReceipeItemHeight = height * 0.40;
     return Scaffold(
       body: ListView.builder(
-        itemCount: 13,
+        itemCount: 5,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             return SizedBox(
                 height: searchBarHeight, child: const HomeSearchBarWidget());
           } else if (index == 1) {
             return SizedBox(
-                height: categoryItemHeight,
-                child: Obx(() {
+              height: categoryItemHeight,
+              child: Obx(
+                () {
                   controller.loadData();
                   if (controller.datafetched.isFalse) {
                     return const Center(child: CircularProgressIndicator());
@@ -34,7 +35,9 @@ class HomePage extends GetView<HomePageController> {
                     return CategoryReceipeList(
                         categories: controller.categories);
                   }
-                }));
+                },
+              ),
+            );
           } else if (index == 2) {
             return SizedBox(
                 height: favouriteReciepeItemHeight,
@@ -43,8 +46,19 @@ class HomePage extends GetView<HomePageController> {
             return const CacheReceipesTitle();
           } else {
             return SizedBox(
-                height: cacheReceipeItemHeight,
-                child: const CacheReceipesList());
+              height: cacheReceipeItemHeight,
+              width: cacheReceipeItemHeight,
+              child: Obx(
+                () {
+                  if (controller.randomMealReceived.isFalse) {
+                    controller.getRandomDish();
+                    return const CircularProgressIndicator();
+                  } else {
+                    return RandomReceipeItem(meal: controller.randomMeal!);
+                  }
+                },
+              ),
+            );
           }
         },
       ),
