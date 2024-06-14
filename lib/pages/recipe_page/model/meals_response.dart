@@ -2,16 +2,16 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:recipe_book/pages/recipe_page/model/meals_api_model.dart';
+import 'package:recipe_book/services/database_services/meal.dart';
 
 class MealResponse {
-  List<MealsModel> meals;
+  List<Meal> meals;
   MealResponse({
     required this.meals,
   });
 
   MealResponse copyWith({
-    List<MealsModel>? meals,
+    List<Meal>? meals,
   }) {
     return MealResponse(
       meals: meals ?? this.meals,
@@ -26,9 +26,9 @@ class MealResponse {
 
   factory MealResponse.fromMap(Map<String, dynamic> map) {
     return MealResponse(
-      meals: List<MealsModel>.from(
-        (map['meals'] as List).map<MealsModel>(
-          (x) => MealsModel.fromMap(x ??
+      meals: List<Meal>.from(
+        (map['meals'] as List).map<Meal>(
+          (x) => Meal.fromMap(x ??
               [
                 {
                   'idMeal': '',

@@ -1,19 +1,34 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:recipe_book/services/database_services/database.dart';
+import 'package:recipe_book/services/database_services/meal.dart';
 import 'package:recipe_book/services/notification_services/local_notification_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class RecipeController extends GetxController {
-  void scheduleNotification(BuildContext context, String title) async {
+  final DBHelper _db = DBHelper();
+  void scheduleNotification(
+      BuildContext context, String title, String url) async {
     var time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
       initialEntryMode: TimePickerEntryMode.dialOnly,
     );
-    if (time != null) {
-      LocalNotificationService().setTimerNotification(time, title);
+    if (await LocalNotificationService().requestNotificationPermission()) {
+      if (time != null) {
+        var currentDateTime = DateTime.now();
+        var scheduledTime = DateTime(
+            currentDateTime.year,
+            currentDateTime.month,
+            currentDateTime.day,
+            time.hour,
+            time.minute,
+            currentDateTime.second,
+            currentDateTime.millisecond,
+            currentDateTime.microsecond);
+        LocalNotificationService()
+            .setTimerNotification(scheduledTime, title, url);
+      }
     }
   }
 
@@ -25,16 +40,12 @@ class RecipeController extends GetxController {
         if (key.startsWith('strIng')) {
           if ((value as String).isNotEmpty) {
             ingredientsList.add(value);
-          } else {
-            log('[key : $key , value : $value]');
           }
         }
         if (key.startsWith('strMeasure')) {
           if ((value as String).isNotEmpty) {
             quantityList.add(value);
           }
-        } else {
-          log('[key : $key , value : $value]');
         }
       },
     );
@@ -54,5 +65,13 @@ class RecipeController extends GetxController {
   void openOriginalRecipe(BuildContext context, String recipeUrl) async {
     Uri uri = Uri.parse(recipeUrl);
     if (!await launchUrl(uri)) {}
+  }
+
+  void addMealToFavourites(Meal meal) {
+    _db.insert(meal);
+  }
+
+  void removeMealFromFavourites(Meal meal) {
+    _db.delete(meal);
   }
 }

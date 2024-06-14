@@ -3,7 +3,6 @@ import 'package:recipe_book/pages/category_page/model/category_model.dart';
 import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
 import 'package:recipe_book/pages/home_page/model/categories_list_model.dart';
 import 'package:recipe_book/pages/recipe_page/model/meals_api_model.dart';
-import 'package:recipe_book/pages/recipe_page/model/meals_response.dart';
 import 'package:recipe_book/services/meal_services/category_service/category_service.dart';
 import 'package:recipe_book/services/meal_services/recipe_service/recipe_service.dart';
 

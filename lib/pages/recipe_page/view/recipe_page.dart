@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
-import 'package:recipe_book/pages/recipe_page/model/meals_api_model.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/ingredeints_quantity_list.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/ingredient_and_quantity_design.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/recipe_tutorial_design.dart';
+import 'package:recipe_book/services/database_services/meal.dart';
 
 class RecipePage extends StatelessWidget {
   const RecipePage({super.key});
@@ -14,7 +14,7 @@ class RecipePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final recipeController = Get.put(RecipeController());
-    final MealsModel meal = Get.arguments;
+    final Meal meal = Get.arguments;
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final style = TextStyle(
       color: Colors.black,
@@ -25,14 +25,15 @@ class RecipePage extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () {
-                recipeController.scheduleNotification(context, 'Timer up');
+                recipeController.scheduleNotification(
+                    context, meal.strMeal, meal.strMealThumb);
               },
               icon: const Icon(
                 Icons.timer_outlined,
               )),
           IconButton(
               onPressed: () {
-                //add to favourites list
+                recipeController.addMealToFavourites(meal);
               },
               icon: const Icon(
                 Icons.favorite_outline,
