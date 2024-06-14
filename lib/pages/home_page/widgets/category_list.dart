@@ -69,7 +69,8 @@ class CategoryListItem extends GetView<HomePageController> {
     final padding = size.width * 0.01;
     final borderWidth = size.width * 0.003;
     final itemBorderRadius = size.width * 0.07;
-    const itemTextColor = Colors.black;
+    final itemTextSize = size.width * 0.05;
+    const itemTextColor = Colors.black54;
     const imageOpacity = 0.7;
     return GestureDetector(
       onTap: () {
@@ -82,16 +83,19 @@ class CategoryListItem extends GetView<HomePageController> {
               border: Border.all(width: borderWidth, color: Colors.black),
               image: DecorationImage(
                   image: NetworkImage(category.strCategoryThumb),
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                   opacity: imageOpacity),
               borderRadius: BorderRadius.circular(itemBorderRadius)),
           child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Text(
-                category.strCategory,
-                style: const TextStyle(
-                    color: itemTextColor, fontWeight: FontWeight.bold),
-              )),
+            alignment: Alignment.center,
+            child: Text(
+              category.strCategory,
+              style: TextStyle(
+                  color: itemTextColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: itemTextSize),
+            ),
+          ),
         ),
       ),
     );
