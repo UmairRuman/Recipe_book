@@ -11,7 +11,7 @@ void main() async {
   tz.initializeTimeZones();
   runApp(const MyApp());
 }
-
+//!timer ka bas gradle set krna hay aur baki category page ki app bar set krni hay
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
