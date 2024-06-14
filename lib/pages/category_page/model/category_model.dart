@@ -1,80 +1,83 @@
+import 'dart:convert';
+
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 class CategoryModel {
-  final String image;
-  final String recipeName;
-  final String recipeDetail;
-  const CategoryModel({
-    required this.image,
-    required this.recipeName,
-    required this.recipeDetail,
+  String? idCategory;
+  String? strCategory;
+  String? strCategoryThumb;
+  String? strCategoryDescription;
+  CategoryModel({
+    this.idCategory,
+    this.strCategory,
+    this.strCategoryThumb,
+    this.strCategoryDescription,
   });
 
-  @override
-  String toString() =>
-      'CategoryModel(image: $image, recipeName: $recipeName, recipeDetail: $recipeDetail)';
-}
+  CategoryModel copyWith({
+    String? idCategory,
+    String? strCategory,
+    String? strCategoryThumb,
+    String? strCategoryDescription,
+  }) {
+    return CategoryModel(
+      idCategory: idCategory ?? this.idCategory,
+      strCategory: strCategory ?? this.strCategory,
+      strCategoryThumb: strCategoryThumb ?? this.strCategoryThumb,
+      strCategoryDescription:
+          strCategoryDescription ?? this.strCategoryDescription,
+    );
+  }
 
-const categoriesDummyList = [
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail:
-          'In this recipe we will be going to make fish tacos and now we will tak a fish and a tco and now we have a taco fish.Now go and make your fish taco',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-];
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'idCategory': idCategory,
+      'strCategory': strCategory,
+      'strCategoryThumb': strCategoryThumb,
+      'strCategoryDescription': strCategoryDescription,
+    };
+  }
+
+  factory CategoryModel.fromMap(Map<String, dynamic> map) {
+    return CategoryModel(
+      idCategory:
+          map['idCategory'] != null ? map['idCategory'] as String : null,
+      strCategory:
+          map['strCategory'] != null ? map['strCategory'] as String : null,
+      strCategoryThumb: map['strCategoryThumb'] != null
+          ? map['strCategoryThumb'] as String
+          : null,
+      strCategoryDescription: map['strCategoryDescription'] != null
+          ? map['strCategoryDescription'] as String
+          : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory CategoryModel.fromJson(String source) =>
+      CategoryModel.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() {
+    return 'CategoryModel(idCategory: $idCategory, strCategory: $strCategory, strCategoryThumb: $strCategoryThumb, strCategoryDescription: $strCategoryDescription)';
+  }
+
+  @override
+  bool operator ==(covariant CategoryModel other) {
+    if (identical(this, other)) return true;
+
+    return other.idCategory == idCategory &&
+        other.strCategory == strCategory &&
+        other.strCategoryThumb == strCategoryThumb &&
+        other.strCategoryDescription == strCategoryDescription;
+  }
+
+  @override
+  int get hashCode {
+    return idCategory.hashCode ^
+        strCategory.hashCode ^
+        strCategoryThumb.hashCode ^
+        strCategoryDescription.hashCode;
+  }
+}

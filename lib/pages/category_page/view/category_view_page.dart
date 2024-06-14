@@ -5,7 +5,7 @@ import 'package:recipe_book/pages/category_page/widgets/category_list.dart';
 
 class CategoryPage extends StatelessWidget {
   const CategoryPage({super.key});
-  static const pageName = '/category';
+  static const pageAddress = '/category';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +20,7 @@ class CategoryPage extends StatelessWidget {
               pinned: true,
               flexibleSpace: const AppBarDesign(),
             ),
-            const CategoryList(categories: categoriesDummyList)
+            // const CategoryList(categories: categoriesDummyList)
           ],
         ),
       ),

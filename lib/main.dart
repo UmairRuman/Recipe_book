@@ -1,31 +1,35 @@
-import 'package:flutter/material.dart';
-import 'package:get/get_navigation/get_navigation.dart';
-import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
-import 'package:recipe_book/pages/home_page/view/home_page.dart';
-import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get/get_navigation/get_navigation.dart';
+// import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
+// import 'package:recipe_book/pages/home_page/view/home_page.dart';
+// import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+// void main() {
+//   runApp(const MyApp());
+// }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return GetMaterialApp(
-      getPages: [
-        GetPage(
-          name: CategoryPage.pageName,
-          page: () => const CategoryPage(),
-        ),
-        GetPage(
-          name: RecipePage.pageName,
-          page: () => const RecipePage(),
-        )
-      ],
-      debugShowCheckedModeBanner: false,
-      home: const HomePage(),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return GetMaterialApp(
+//       getPages: [
+//         GetPage(
+//           name: CategoryPage.pageAddress,
+//           page: () => const CategoryPage(),
+//         ),
+//         GetPage(
+//           name: RecipePage.pageAddress,
+//           page: () => const RecipePage(),
+//         ),
+//         GetPage(
+//           name: HomePage.pageAddress,
+//           page: () => const RecipePage(),
+//         )
+//       ],
+//       debugShowCheckedModeBanner: false,
+//       home: const HomePage(),
+//     );
+//   }
+// }

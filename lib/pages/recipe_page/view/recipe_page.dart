@@ -4,7 +4,7 @@ import 'package:recipe_book/pages/recipe_page/widgets/recipe_tutorial_design.dar
 
 class RecipePage extends StatelessWidget {
   const RecipePage({super.key});
-  static const pageName = '/recipe';
+  static const pageAddress = '/recipe';
 
   @override
   Widget build(BuildContext context) {
