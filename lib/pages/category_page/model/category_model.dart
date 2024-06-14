@@ -1,83 +1,62 @@
 import 'dart:convert';
 
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-
-class CategoryModel {
-  String? idCategory;
-  String? strCategory;
-  String? strCategoryThumb;
-  String? strCategoryDescription;
-  CategoryModel({
-    this.idCategory,
-    this.strCategory,
-    this.strCategoryThumb,
-    this.strCategoryDescription,
+class CategoryItem {
+  String strMeal = '';
+  String strMealThumb = '';
+  String idMeal = '';
+  CategoryItem({
+    required this.strMeal,
+    required this.strMealThumb,
+    required this.idMeal,
   });
 
-  CategoryModel copyWith({
-    String? idCategory,
-    String? strCategory,
-    String? strCategoryThumb,
-    String? strCategoryDescription,
+  CategoryItem copyWith({
+    String? strMeal,
+    String? strMealThumb,
+    String? idMeal,
   }) {
-    return CategoryModel(
-      idCategory: idCategory ?? this.idCategory,
-      strCategory: strCategory ?? this.strCategory,
-      strCategoryThumb: strCategoryThumb ?? this.strCategoryThumb,
-      strCategoryDescription:
-          strCategoryDescription ?? this.strCategoryDescription,
+    return CategoryItem(
+      strMeal: strMeal ?? this.strMeal,
+      strMealThumb: strMealThumb ?? this.strMealThumb,
+      idMeal: idMeal ?? this.idMeal,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'idCategory': idCategory,
-      'strCategory': strCategory,
-      'strCategoryThumb': strCategoryThumb,
-      'strCategoryDescription': strCategoryDescription,
+      'strMeal': strMeal,
+      'strMealThumb': strMealThumb,
+      'idMeal': idMeal,
     };
   }
 
-  factory CategoryModel.fromMap(Map<String, dynamic> map) {
-    return CategoryModel(
-      idCategory:
-          map['idCategory'] != null ? map['idCategory'] as String : null,
-      strCategory:
-          map['strCategory'] != null ? map['strCategory'] as String : null,
-      strCategoryThumb: map['strCategoryThumb'] != null
-          ? map['strCategoryThumb'] as String
-          : null,
-      strCategoryDescription: map['strCategoryDescription'] != null
-          ? map['strCategoryDescription'] as String
-          : null,
+  factory CategoryItem.fromMap(Map<String, dynamic> map) {
+    return CategoryItem(
+      strMeal: map['strMeal'] as String,
+      strMealThumb: map['strMealThumb'] as String,
+      idMeal: map['idMeal'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory CategoryModel.fromJson(String source) =>
-      CategoryModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CategoryItem.fromJson(String source) =>
+      CategoryItem.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() {
-    return 'CategoryModel(idCategory: $idCategory, strCategory: $strCategory, strCategoryThumb: $strCategoryThumb, strCategoryDescription: $strCategoryDescription)';
-  }
+  String toString() =>
+      'CategoryModel(strMeal: $strMeal, strMealThumb: $strMealThumb, idMeal: $idMeal)';
 
   @override
-  bool operator ==(covariant CategoryModel other) {
+  bool operator ==(covariant CategoryItem other) {
     if (identical(this, other)) return true;
 
-    return other.idCategory == idCategory &&
-        other.strCategory == strCategory &&
-        other.strCategoryThumb == strCategoryThumb &&
-        other.strCategoryDescription == strCategoryDescription;
+    return other.strMeal == strMeal &&
+        other.strMealThumb == strMealThumb &&
+        other.idMeal == idMeal;
   }
 
   @override
-  int get hashCode {
-    return idCategory.hashCode ^
-        strCategory.hashCode ^
-        strCategoryThumb.hashCode ^
-        strCategoryDescription.hashCode;
-  }
+  int get hashCode =>
+      strMeal.hashCode ^ strMealThumb.hashCode ^ idMeal.hashCode;
 }

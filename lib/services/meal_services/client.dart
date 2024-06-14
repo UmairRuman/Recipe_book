@@ -7,7 +7,7 @@ extension ApiResponse on Response {
 }
 
 abstract class ApiService {
-  String get baseUrl => 'www.themealdb.com/api/json/v1/1';
+  String get baseUrl => 'https://www.themealdb.com/api/json/v1/1';
   String get apiUrl;
 
   dynamic fetch({String endPoint = ''}) async {

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
 import 'package:recipe_book/pages/home_page/widgets/cache_receipes.dart';
 import 'package:recipe_book/pages/home_page/widgets/category_list.dart';
 import 'package:recipe_book/pages/home_page/widgets/fav_list.dart';
 import 'package:recipe_book/pages/home_page/widgets/search_bar.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
   static const pageAddress = '/';
   @override
@@ -23,7 +25,16 @@ class HomePage extends StatelessWidget {
                 height: searchBarHeight, child: const HomeSearchBarWidget());
           } else if (index == 1) {
             return SizedBox(
-                height: categoryItemHeight, child: const CategoryReceipeList());
+                height: categoryItemHeight,
+                child: Obx(() {
+                  controller.loadData();
+                  if (controller.datafetched.isFalse) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    return CategoryReceipeList(
+                        categories: controller.categories);
+                  }
+                }));
           } else if (index == 2) {
             return SizedBox(
                 height: favouriteReciepeItemHeight,
