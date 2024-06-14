@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:recipe_book/pages/category_page/model/category_model.dart';
 import 'package:recipe_book/pages/category_page/widgets/app_bar_design.dart';
 import 'package:recipe_book/pages/category_page/widgets/category_list.dart';
 
 class CategoryPage extends StatelessWidget {
   const CategoryPage({super.key});
-  static const pageName = '/category';
+  static const pageAddress = '/category';
   @override
   Widget build(BuildContext context) {
+    final List<CategoryItem> categories = Get.arguments;
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) => CustomScrollView(
@@ -20,7 +22,7 @@ class CategoryPage extends StatelessWidget {
               pinned: true,
               flexibleSpace: const AppBarDesign(),
             ),
-            const CategoryList(categories: categoriesDummyList)
+            CategoryList(categories: categories),
           ],
         ),
       ),

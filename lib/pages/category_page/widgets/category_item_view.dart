@@ -4,7 +4,7 @@ import 'package:recipe_book/pages/category_page/widgets/item_view_bottom_design.
 
 class CategoryItemView extends StatelessWidget {
   const CategoryItemView({super.key, required this.category});
-  final CategoryModel category;
+  final CategoryItem category;
   static const shadows = [
     BoxShadow(
         color: Colors.black54,
@@ -48,7 +48,7 @@ class CategoryItemView extends StatelessWidget {
                           width: constraints.maxWidth * imageWidth,
                           height: constraints.maxHeight * imageHeight,
                           child: Image.network(
-                            category.image,
+                            category.strMealThumb,
                           ),
                         ),
                         Positioned(
@@ -69,7 +69,7 @@ class CategoryItemView extends StatelessWidget {
                           left:
                               constraints.maxWidth * recipeNamePaddingFromLeft),
                       child: Text(
-                        category.recipeName,
+                        category.strMeal,
                         style: recipeStyle,
                       ),
                     ),
@@ -80,8 +80,8 @@ class CategoryItemView extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: CategoryItemViewBottomDesign(
-                    recipeName: category.recipeName,
-                    recipeDetail: category.recipeDetail,
+                    recipeName: category.strMeal,
+                    recipeDetail: 'This is jamshaid fault',
                   ),
                 )),
           ],

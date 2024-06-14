@@ -4,7 +4,7 @@ import 'package:recipe_book/pages/category_page/widgets/category_item_view.dart'
 
 class CategoryList extends StatelessWidget {
   const CategoryList({super.key, required this.categories});
-  final List<CategoryModel> categories;
+  final List<CategoryItem> categories;
   @override
   Widget build(BuildContext context) {
     final Size(:height) = MediaQuery.sizeOf(context);

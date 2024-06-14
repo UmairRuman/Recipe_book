@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/simple/get_view.dart';
+import 'package:recipe_book/pages/home_page/model/categories_list_model.dart';
+import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
 
 class CategoryReceipeList extends StatelessWidget {
-  const CategoryReceipeList({super.key});
+  final List<CategoriesModel> categories;
+  const CategoryReceipeList({super.key, required this.categories});
 
   @override
   Widget build(BuildContext context) {
@@ -18,28 +22,32 @@ class CategoryReceipeList extends StatelessWidget {
         return Column(
           children: [
             SizedBox(
-                height: categoryTitleHeight,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: EdgeInsets.all(categoryTitlePadding),
-                    child: Text(
-                      categoryTitleText,
-                      style: TextStyle(
-                          color: categoryTitleColor,
-                          fontSize: categoryTitleFontSize),
-                    ),
+              height: categoryTitleHeight,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.all(categoryTitlePadding),
+                  child: Text(
+                    categoryTitleText,
+                    style: TextStyle(
+                        color: categoryTitleColor,
+                        fontSize: categoryTitleFontSize),
                   ),
-                )),
+                ),
+              ),
+            ),
             SizedBox(
               height: categoryItemHeight,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: 5,
+                itemCount: categories.length,
                 itemBuilder: (context, index) {
+                  var currentCategory = categories[index];
                   return SizedBox(
                     width: categoryItemWidth,
-                    child: const CategoryListItem(),
+                    child: CategoryListItem(
+                      category: currentCategory,
+                    ),
                   );
                 },
               ),
@@ -51,32 +59,40 @@ class CategoryReceipeList extends StatelessWidget {
   }
 }
 
-class CategoryListItem extends StatelessWidget {
-  const CategoryListItem({super.key});
+class CategoryListItem extends GetView<HomePageController> {
+  final CategoriesModel category;
+  const CategoryListItem({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final padding = size.width * 0.01;
+    final borderWidth = size.width * 0.003;
     final itemBorderRadius = size.width * 0.07;
     const itemTextColor = Colors.black;
-    const imageOpacity = 0.5;
-    return Padding(
-      padding: EdgeInsets.all(padding),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-            image: const DecorationImage(
-                image: AssetImage('assets/images/hashbrown.jpg'),
-                fit: BoxFit.cover,
-                opacity: imageOpacity),
-            borderRadius: BorderRadius.circular(itemBorderRadius)),
-        child: const Align(
-            alignment: Alignment.bottomCenter,
-            child: Text(
-              'BreakFast',
-              style:
-                  TextStyle(color: itemTextColor, fontWeight: FontWeight.bold),
-            )),
+    const imageOpacity = 0.7;
+    return GestureDetector(
+      onTap: () {
+        controller.pushCategoryPage(category.strCategory);
+      },
+      child: Padding(
+        padding: EdgeInsets.all(padding),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+              border: Border.all(width: borderWidth, color: Colors.black),
+              image: DecorationImage(
+                  image: NetworkImage(category.strCategoryThumb),
+                  fit: BoxFit.fill,
+                  opacity: imageOpacity),
+              borderRadius: BorderRadius.circular(itemBorderRadius)),
+          child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                category.strCategory,
+                style: const TextStyle(
+                    color: itemTextColor, fontWeight: FontWeight.bold),
+              )),
+        ),
       ),
     );
   }

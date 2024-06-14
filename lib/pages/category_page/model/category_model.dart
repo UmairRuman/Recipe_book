@@ -1,80 +1,62 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
 
-class CategoryModel {
-  final String image;
-  final String recipeName;
-  final String recipeDetail;
-  const CategoryModel({
-    required this.image,
-    required this.recipeName,
-    required this.recipeDetail,
+class CategoryItem {
+  String strMeal = '';
+  String strMealThumb = '';
+  String idMeal = '';
+  CategoryItem({
+    required this.strMeal,
+    required this.strMealThumb,
+    required this.idMeal,
   });
+
+  CategoryItem copyWith({
+    String? strMeal,
+    String? strMealThumb,
+    String? idMeal,
+  }) {
+    return CategoryItem(
+      strMeal: strMeal ?? this.strMeal,
+      strMealThumb: strMealThumb ?? this.strMealThumb,
+      idMeal: idMeal ?? this.idMeal,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'strMeal': strMeal,
+      'strMealThumb': strMealThumb,
+      'idMeal': idMeal,
+    };
+  }
+
+  factory CategoryItem.fromMap(Map<String, dynamic> map) {
+    return CategoryItem(
+      strMeal: map['strMeal'] as String,
+      strMealThumb: map['strMealThumb'] as String,
+      idMeal: map['idMeal'] as String,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory CategoryItem.fromJson(String source) =>
+      CategoryItem.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() =>
-      'CategoryModel(image: $image, recipeName: $recipeName, recipeDetail: $recipeDetail)';
-}
+      'CategoryModel(strMeal: $strMeal, strMealThumb: $strMealThumb, idMeal: $idMeal)';
 
-const categoriesDummyList = [
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail:
-          'In this recipe we will be going to make fish tacos and now we will tak a fish and a tco and now we have a taco fish.Now go and make your fish taco',
-      recipeName: 'Arrabiata'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-  CategoryModel(
-      image:
-          'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
-      recipeDetail: 'askdjhkasjfkasjfhklsjdfhlakj',
-      recipeName: 'fish tacos'),
-];
+  @override
+  bool operator ==(covariant CategoryItem other) {
+    if (identical(this, other)) return true;
+
+    return other.strMeal == strMeal &&
+        other.strMealThumb == strMealThumb &&
+        other.idMeal == idMeal;
+  }
+
+  @override
+  int get hashCode =>
+      strMeal.hashCode ^ strMealThumb.hashCode ^ idMeal.hashCode;
+}
