@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
 import 'package:recipe_book/pages/recipe_page/model/meals_api_model.dart';
-import 'package:recipe_book/pages/recipe_page/widgets/app_bar_design.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/ingredeints_quantity_list.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/ingredient_and_quantity_design.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/recipe_tutorial_design.dart';
@@ -14,7 +13,7 @@ class RecipePage extends StatelessWidget {
   static const originalRecipeLink = 'Recipe link :';
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(RecipeController());
+    final recipeController = Get.put(RecipeController());
     final MealsModel meal = Get.arguments;
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final style = TextStyle(
@@ -23,13 +22,34 @@ class RecipePage extends StatelessWidget {
     );
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: height * 0.25,
-        flexibleSpace: const RecipeAppBarDesign(),
+        actions: [
+          IconButton(
+              onPressed: () {
+                recipeController.scheduleNotification(context, 'Timer up');
+              },
+              icon: const Icon(
+                Icons.timer_outlined,
+              )),
+          IconButton(
+              onPressed: () {
+                //add to favourites list
+              },
+              icon: const Icon(
+                Icons.favorite_outline,
+              )),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: EdgeInsets.only(left: width * 0.3),
+              child: CircleAvatar(
+                radius: height * 0.1,
+                backgroundImage: NetworkImage(meal.strMealThumb),
+              ),
+            ),
             RecipeAndTutorialDesign(
               recipeName: meal.strMeal,
               videoUrl: meal.strYoutube,
@@ -37,7 +57,7 @@ class RecipePage extends StatelessWidget {
             const IngredientAndQuantityHeadings(),
             IngredientsQuantityList(
               ingredientsAndQuantityList:
-                  controller.ingredientsAndQuantityList(meal.toMap()),
+                  recipeController.ingredientsAndQuantityList(meal.toMap()),
             ),
             Padding(
               padding: EdgeInsets.only(left: width * 0.07),
@@ -55,30 +75,43 @@ class RecipePage extends StatelessWidget {
                 ),
               ),
             ),
-            if (meal.strSource.isNotEmpty)
-              Padding(
-                padding: EdgeInsets.only(
-                    left: width * 0.07,
-                    top: height * 0.02,
-                    bottom: height * 0.02),
-                child: SizedBox(
-                  width: width * 0.85,
-                  child: RichText(
-                      text: TextSpan(children: [
-                    const TextSpan(
-                      text: '\u{1F517}',
-                    ),
-                    TextSpan(
-                        text: meal.strSource,
-                        style: const TextStyle(
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                          decorationColor: Colors.blue,
-                        ))
-                  ])),
-                ),
-              )
+            if (meal.strSource.isNotEmpty) LinkWidget(source: meal.strSource),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class LinkWidget extends StatelessWidget {
+  const LinkWidget({super.key, required this.source});
+  final String source;
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<RecipeController>();
+    final Size(:width, :height) = MediaQuery.sizeOf(context);
+    return Padding(
+      padding: EdgeInsets.only(
+          left: width * 0.07, top: height * 0.02, bottom: height * 0.02),
+      child: SizedBox(
+        width: width * 0.85,
+        child: GestureDetector(
+          onTap: () {
+            controller.openOriginalRecipe(context, source);
+          },
+          child: RichText(
+              text: TextSpan(children: [
+            const TextSpan(
+              text: '\u{1F517}',
+            ),
+            TextSpan(
+                text: source,
+                style: const TextStyle(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.blue,
+                ))
+          ])),
         ),
       ),
     );

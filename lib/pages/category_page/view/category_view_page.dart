@@ -16,11 +16,12 @@ class CategoryPage extends StatelessWidget {
           slivers: [
             SliverAppBar(
               expandedHeight: constraints.maxHeight * 0.25,
-              surfaceTintColor: Colors.transparent,
-              shadowColor: Colors.transparent,
               forceElevated: false,
               pinned: true,
-              flexibleSpace: const AppBarDesign(),
+              flexibleSpace: const AppBarDesign(
+                categoryImage:
+                    'https://www.themealdb.com/images/category/beef.png',
+              ),
             ),
             CategoryList(categories: categories),
           ],

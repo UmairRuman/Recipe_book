@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
 
 class AppBarDesign extends StatelessWidget {
-  const AppBarDesign({super.key});
-
+  const AppBarDesign({super.key, required this.categoryImage});
+  final String categoryImage;
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const url =
-            'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg';
         final borderRadius = Radius.circular(constraints.maxWidth * 0.15);
         return Container(
           width: constraints.maxWidth,
           height: constraints.maxHeight,
           decoration: BoxDecoration(
-            color: Colors.transparent,
+            color: Colors.white,
+            boxShadow: const [
+              BoxShadow(
+                  color: Colors.black54,
+                  blurRadius: 20,
+                  spreadRadius: 5,
+                  offset: Offset(3, 3))
+            ],
             borderRadius: BorderRadius.only(
               bottomLeft: borderRadius,
               bottomRight: borderRadius,
             ),
-            image: const DecorationImage(
+            image: DecorationImage(
                 image: NetworkImage(
-                  url,
+                  categoryImage,
                 ),
                 filterQuality: FilterQuality.high,
                 fit: BoxFit.fill,

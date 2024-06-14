@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart';
+import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
 
 class RecipeAndTutorialDesign extends StatelessWidget {
   const RecipeAndTutorialDesign(
@@ -9,6 +10,7 @@ class RecipeAndTutorialDesign extends StatelessWidget {
   static const tutorial = 'Watch Video';
   @override
   Widget build(BuildContext context) {
+    final recipeController = Get.find<RecipeController>();
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final style = TextStyle(
       color: Colors.black,
@@ -30,12 +32,8 @@ class RecipeAndTutorialDesign extends StatelessWidget {
           Expanded(
               flex: 1,
               child: TextButton(
-                onPressed: () async {
-                  Uri uri = Uri.parse(videoUrl);
-                  if (!await launchUrl(uri)) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('No Video Available')));
-                  }
+                onPressed: () {
+                  recipeController.openYoutubeVideo(context, videoUrl);
                 },
                 child: const Text(
                   tutorial,

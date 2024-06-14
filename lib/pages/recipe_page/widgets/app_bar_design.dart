@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
 
 class RecipeAppBarDesign extends StatelessWidget {
-  const RecipeAppBarDesign({super.key});
+  const RecipeAppBarDesign({super.key, required this.mealImage});
+  final String mealImage;
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -19,44 +20,51 @@ class RecipeAppBarDesign extends StatelessWidget {
               bottomLeft: borderRadius,
               bottomRight: borderRadius,
             ),
-            image: const DecorationImage(
+            image: DecorationImage(
                 image: NetworkImage(
-                  'https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg',
+                  mealImage,
                 ),
                 filterQuality: FilterQuality.high,
                 fit: BoxFit.fill,
                 opacity: 0.8),
           ),
-          child: Align(
-            alignment: Alignment.topRight,
-            child: ButtonBar(
-              children: [
-                IconButton(
-                    onPressed: () async {
-                      var time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                        initialEntryMode: TimePickerEntryMode.dialOnly,
-                      );
-                      if (time != null) {
-                        recipeController.scheduleNotification(
-                            time, 'Fish taco timer up');
-                      }
-                    },
+          child: Stack(
+            alignment: Alignment.topLeft,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: constraints.maxHeight * 0.1),
+                child: IconButton(
+                    onPressed: recipeController.navigateBackToCategoryPage,
                     icon: const Icon(
-                      Icons.timer_outlined,
+                      Icons.arrow_back,
                       color: Colors.white,
                     )),
-                IconButton(
-                    onPressed: () {
-                      //add to favourites list
-                    },
-                    icon: const Icon(
-                      Icons.favorite_outline,
-                      color: Colors.white,
-                    )),
-              ],
-            ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: constraints.maxHeight * 0.1),
+                child: ButtonBar(
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          recipeController.scheduleNotification(
+                              context, 'Timer up');
+                        },
+                        icon: const Icon(
+                          Icons.timer_outlined,
+                          color: Colors.white,
+                        )),
+                    IconButton(
+                        onPressed: () {
+                          //add to favourites list
+                        },
+                        icon: const Icon(
+                          Icons.favorite_outline,
+                          color: Colors.white,
+                        )),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },

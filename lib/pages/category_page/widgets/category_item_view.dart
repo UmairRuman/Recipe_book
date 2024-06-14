@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:recipe_book/pages/category_page/controller/category_controller.dart';
 import 'package:recipe_book/pages/category_page/model/category_model.dart';
-import 'package:recipe_book/pages/category_page/widgets/item_view_bottom_design.dart';
 
-class CategoryItemView extends StatelessWidget {
+class CategoryItemView extends GetView<CategoryController> {
   const CategoryItemView({super.key, required this.category});
   final CategoryItem category;
   static const shadows = [
@@ -12,11 +13,17 @@ class CategoryItemView extends StatelessWidget {
         spreadRadius: 5,
         offset: Offset(3, 3))
   ];
-
   static const recipeNamePaddingFromTop = 0.3;
   static const recipeNamePaddingFromLeft = 0.05;
-  static const imageWidth = 0.85;
-  static const imageHeight = 0.8;
+  static const favIconSpacingFromTop = 0.1;
+  static const favIconSpacingFromRight = 0.08;
+  static const avatarRadius = 0.08;
+  static const btnText = 'See Recipe';
+
+  void _onBtnTap() {
+    controller.navigateToRecipePage(mealName: category.strMeal);
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size(:width, :height) = MediaQuery.sizeOf(context);
@@ -44,23 +51,23 @@ class CategoryItemView extends StatelessWidget {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        SizedBox(
-                          width: constraints.maxWidth * imageWidth,
-                          height: constraints.maxHeight * imageHeight,
-                          child: Image.network(
+                        CircleAvatar(
+                          radius: height * avatarRadius,
+                          backgroundImage: NetworkImage(
                             category.strMealThumb,
                           ),
                         ),
                         Positioned(
-                            top: constraints.maxHeight * 0.1,
-                            right: constraints.maxWidth * 0.08,
+                            top: constraints.maxHeight * favIconSpacingFromTop,
+                            right:
+                                constraints.maxWidth * favIconSpacingFromRight,
                             child: const Icon(Icons.favorite_outline))
                       ],
                     ),
                   ),
                 )),
             Expanded(
-                flex: 1,
+                flex: 2,
                 child: SizedBox.expand(
                   child: LayoutBuilder(
                     builder: (context, constraints) => Padding(
@@ -76,12 +83,11 @@ class CategoryItemView extends StatelessWidget {
                   ),
                 )),
             Expanded(
-                flex: 2,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: CategoryItemViewBottomDesign(
-                    recipeName: category.strMeal,
-                    recipeDetail: 'This is jamshaid fault',
+                flex: 1,
+                child: Center(
+                  child: TextButton(
+                    onPressed: _onBtnTap,
+                    child: const Text(btnText),
                   ),
                 )),
           ],
