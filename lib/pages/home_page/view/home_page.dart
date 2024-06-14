@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
@@ -30,7 +31,7 @@ class HomePage extends GetView<HomePageController> {
                 () {
                   controller.loadData();
                   if (controller.datafetched.isFalse) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: CupertinoActivityIndicator());
                   } else {
                     return CategoryReceipeList(
                         categories: controller.categories);
@@ -52,7 +53,7 @@ class HomePage extends GetView<HomePageController> {
                 () {
                   if (controller.randomMealReceived.isFalse) {
                     controller.getRandomDish();
-                    return const CircularProgressIndicator();
+                    return const Center(child: CupertinoActivityIndicator());
                   } else {
                     return RandomReceipeItem(meal: controller.randomMeal!);
                   }
