@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 class RecipeAndTutorialDesign extends StatelessWidget {
-  const RecipeAndTutorialDesign({super.key});
-  static const recipe = 'Recipe :';
-  static const tutorial = 'Tutorial :';
+  const RecipeAndTutorialDesign({super.key, required this.recipeName});
+  final String recipeName;
+  static const recipe = 'Recipe :  ';
+  static const tutorial = 'Watch Video';
   @override
   Widget build(BuildContext context) {
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final style = TextStyle(
       color: Colors.black,
-      fontSize: height * 0.035,
+      fontSize: height * 0.03,
       fontWeight: FontWeight.bold,
     );
     return Padding(
@@ -17,36 +18,25 @@ class RecipeAndTutorialDesign extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-              flex: 1,
-              child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Text(
-                    recipe,
-                    style: style,
-                  ))),
-          Expanded(
               flex: 2,
-              child: Row(
-                children: [
-                  Expanded(
-                      flex: 2,
-                      child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Text(
-                            tutorial,
-                            style: style,
-                          ))),
-                  Expanded(
-                      flex: 1,
-                      child: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: IconButton(
-                            onPressed: () {
-                              //take to youtube
-                            },
-                            icon: const Icon(Icons.play_circle_outlined)),
-                      ))
-                ],
+              child: Center(
+                child: Text(
+                  recipeName,
+                  style: style,
+                ),
+              )),
+          Expanded(
+              flex: 1,
+              child: TextButton(
+                onPressed: () {},
+                child: const Text(
+                  tutorial,
+                  style: TextStyle(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                    decorationColor: Colors.blue,
+                  ),
+                ),
               ))
         ],
       ),
