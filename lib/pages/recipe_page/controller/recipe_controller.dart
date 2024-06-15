@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/services/database_services/database.dart';
@@ -6,7 +8,12 @@ import 'package:recipe_book/services/notification_services/local_notification_se
 import 'package:url_launcher/url_launcher.dart';
 
 class RecipeController extends GetxController {
+  static const _videoError = 'No Video Available';
+  static const _recipeError = 'No Recipe Available';
+
   final DBHelper _db = DBHelper();
+  var favourtieIcon = const Icon(Icons.favorite_border_outlined).obs;
+
   void scheduleNotification(BuildContext context, Meal meal) async {
     var time = await showTimePicker(
       context: context,
@@ -56,16 +63,19 @@ class RecipeController extends GetxController {
     Uri uri = Uri.parse(videoUrl);
     if (!await launchUrl(uri)) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('No Video Available')));
+          .showSnackBar(const SnackBar(content: Text(_videoError)));
     }
   }
 
   void openOriginalRecipe(BuildContext context, String recipeUrl) async {
     Uri uri = Uri.parse(recipeUrl);
-    if (!await launchUrl(uri)) {}
+    if (!await launchUrl(uri)) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text(_recipeError)));
+    }
   }
 
-  void addMealToFavourites(Meal meal) {
+  void addMealToFavouruites(Meal meal) {
     _db.insert(meal);
   }
 
@@ -75,5 +85,20 @@ class RecipeController extends GetxController {
 
   bool isFavourite(Meal meal) {
     return _db.isFavourite(meal);
+  }
+
+  void onFavouriteIconTap(Meal meal) {
+    if (_db.isFavourite(meal)) {
+      log('[removed from favourites]');
+      _db.delete(meal);
+      favourtieIcon.value = const Icon(Icons.favorite_border_outlined);
+    } else {
+      log('[added to favourites]');
+      _db.insert(meal);
+      favourtieIcon.value = const Icon(
+        Icons.favorite,
+        color: Colors.red,
+      );
+    }
   }
 }

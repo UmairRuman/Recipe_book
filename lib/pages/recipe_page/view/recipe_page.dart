@@ -4,6 +4,7 @@ import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart'
 import 'package:recipe_book/pages/recipe_page/widgets/ingredeints_quantity_list.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/ingredient_and_quantity_design.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/recipe_tutorial_design.dart';
+import 'package:recipe_book/services/database_services/database.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 
 class RecipePage extends GetView<RecipeController> {
@@ -12,6 +13,7 @@ class RecipePage extends GetView<RecipeController> {
   static const pageAddress = '/recipe';
   static const instructions = 'Instructions :';
   static const originalRecipeLink = 'Recipe link :';
+
   @override
   Widget build(BuildContext context) {
     final Meal meal;
@@ -20,33 +22,35 @@ class RecipePage extends GetView<RecipeController> {
     } else {
       meal = Get.arguments;
     }
-    bool isAddedToFav = controller.isFavourite(meal);
+    bool isPresent = controller.isFavourite(meal);
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final style = TextStyle(
       color: Colors.black,
       fontSize: height * 0.03,
     );
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: DBHelper().deleteAll,
+      ),
       appBar: AppBar(
         actions: [
           IconButton(
-              onPressed: () {
-                controller.scheduleNotification(context, meal);
-              },
+              onPressed: () => controller.scheduleNotification(context, meal),
               icon: const Icon(
                 Icons.timer_outlined,
               )),
           IconButton(
               onPressed: () {
-                if (isAddedToFav) {
+                if (isPresent) {
                   controller.removeMealFromFavourites(meal);
+                  isPresent = false;
                 } else {
-                  controller.addMealToFavourites(meal);
-                  isAddedToFav = true;
+                  controller.addMealToFavouruites(meal);
+                  isPresent = true;
                 }
               },
-              icon: const Icon(
-                Icons.favorite_outline,
+              icon: Obx(
+                () => controller.favourtieIcon.value,
               )),
         ],
       ),
