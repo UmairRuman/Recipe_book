@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
 
-class RecipeAndTutorialDesign extends StatelessWidget {
+class RecipeAndTutorialDesign extends GetView<RecipeController> {
   const RecipeAndTutorialDesign(
       {super.key, required this.recipeName, required this.videoUrl});
   final String recipeName, videoUrl;
@@ -10,7 +10,6 @@ class RecipeAndTutorialDesign extends StatelessWidget {
   static const tutorial = 'Watch Video';
   @override
   Widget build(BuildContext context) {
-    final recipeController = Get.find<RecipeController>();
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final style = TextStyle(
       color: Colors.black,
@@ -33,7 +32,7 @@ class RecipeAndTutorialDesign extends StatelessWidget {
               flex: 1,
               child: TextButton(
                 onPressed: () {
-                  recipeController.openYoutubeVideo(context, videoUrl);
+                  controller.openYoutubeVideo(context, videoUrl);
                 },
                 child: const Text(
                   tutorial,

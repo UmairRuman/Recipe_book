@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:realm/realm.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 
@@ -12,12 +14,13 @@ class DBHelper {
   Realm get _databse => _db ??=
       Realm(Configuration.local([Meal.schema], schemaVersion: schemaVersion));
 
-  void insert(Meal model) {
+  void insert(Meal meal) {
     _databse.write(
       () {
-        _databse.add(model);
+        _databse.add(meal);
       },
     );
+    log('added');
   }
 
   void update(Meal meal) {
@@ -29,6 +32,7 @@ class DBHelper {
   }
 
   void delete(Meal meal) {
+    log('deleted');
     _databse.write(
       () {
         _databse.delete(meal);
@@ -36,7 +40,18 @@ class DBHelper {
     );
   }
 
-  List<Meal> fetchMeals() {
+  List<Meal> favouriteMeals() {
     return _databse.all<Meal>().toList();
+  }
+
+  bool isFavourite(Meal meal) {
+    final meals = _databse.all<Meal>();
+    //If meals is empty means there is no favourite
+    if (meals.isEmpty) {
+      return false;
+    } else {
+      //check if meal is present and return the result
+      return meals.contains(meal);
+    }
   }
 }

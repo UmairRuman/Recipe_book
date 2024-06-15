@@ -7,8 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class RecipeController extends GetxController {
   final DBHelper _db = DBHelper();
-  void scheduleNotification(
-      BuildContext context, String title, String url) async {
+  void scheduleNotification(BuildContext context, Meal meal) async {
     var time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -26,8 +25,7 @@ class RecipeController extends GetxController {
             currentDateTime.second,
             currentDateTime.millisecond,
             currentDateTime.microsecond);
-        LocalNotificationService()
-            .setTimerNotification(scheduledTime, title, url);
+        LocalNotificationService().setTimerNotification(scheduledTime, meal);
       }
     }
   }
@@ -73,5 +71,9 @@ class RecipeController extends GetxController {
 
   void removeMealFromFavourites(Meal meal) {
     _db.delete(meal);
+  }
+
+  bool isFavourite(Meal meal) {
+    return _db.isFavourite(meal);
   }
 }

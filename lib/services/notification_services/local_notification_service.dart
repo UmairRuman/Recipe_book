@@ -1,9 +1,15 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart';
 import 'package:image/image.dart' as img;
+import 'package:recipe_book/pages/home_page/view/home_page.dart';
+import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
+import 'package:recipe_book/services/database_services/meal.dart';
+import 'package:recipe_book/services/meal_services/recipe_service/recipe_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class LocalNotificationService {
@@ -11,6 +17,9 @@ class LocalNotificationService {
   static const _channelId = 'Schedule_1', _channelName = 'Recipe Timer';
   static const _timerBody = 'Time\'s Up!';
   static LocalNotificationService? _instance;
+  final StreamController<String?> selectedNotificationStream =
+      StreamController<String?>.broadcast();
+  Meal? selectedNotificationMeal;
 
   LocalNotificationService._();
   factory LocalNotificationService() =>
@@ -29,7 +38,8 @@ class LocalNotificationService {
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings settings =
         InitializationSettings(android: androidSettings);
-    _flutterLocalNotificationsPlugin.initialize(settings);
+    _flutterLocalNotificationsPlugin.initialize(settings,
+        onDidReceiveNotificationResponse: _ondidRecieveNotificationHandler);
   }
 
   Future<bool> requestNotificationPermission() async {
@@ -41,36 +51,10 @@ class LocalNotificationService {
     return false;
   }
 
-  // void setTimerNotification(DateTime dateTime, String title, String url) async {
-  //   var imageUrl = url;
-  //   log(imageUrl);
-  //   final largeIcon =
-  //       ByteArrayAndroidBitmap(await _getByteArrayFromUrl(imageUrl));
-  //   log(largeIcon.toString());
-  //   final AndroidNotificationDetails androidNotificationDetails =
-  //       AndroidNotificationDetails(_channelId, _channelName,
-  //           largeIcon: largeIcon);
-  //   final NotificationDetails notificationDetails =
-  //       NotificationDetails(android: androidNotificationDetails);
-  //   await _flutterLocalNotificationsPlugin.zonedSchedule(
-  //       _notificationId,
-  //       title,
-  //       _timerBody,
-  //       tz.TZDateTime.from(dateTime, tz.getLocation('Asia/Karachi')),
-  //       notificationDetails,
-  //       uiLocalNotificationDateInterpretation:
-  //           UILocalNotificationDateInterpretation.absoluteTime,
-  //       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle);
-  // }
-
-  // Future<Uint8List> _getByteArrayFromUrl(String url) async {
-  //   final Response response = await get(Uri.parse(url));
-  //   return response.bodyBytes;
-  // }
-
-  void setTimerNotification(DateTime dateTime, String title, String url) async {
+  void setTimerNotification(DateTime dateTime, Meal meal) async {
     //set the large icon with the meal image
-    final largeIcon = ByteArrayAndroidBitmap(await _getByteArrayFromUrl(url));
+    final largeIcon =
+        ByteArrayAndroidBitmap(await _getByteArrayFromUrl(meal.strMealThumb));
     //set android details
     final AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(_channelId, _channelName,
@@ -81,13 +65,14 @@ class LocalNotificationService {
     //schedule Notification
     await _flutterLocalNotificationsPlugin.zonedSchedule(
         _notificationId,
-        title,
+        meal.strMeal,
         _timerBody,
         tz.TZDateTime.from(dateTime, tz.getLocation('Asia/Karachi')),
         notificationDetails,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle);
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: meal.strMeal);
   }
 
   Future<Uint8List> _getByteArrayFromUrl(String url) async {
@@ -140,5 +125,25 @@ class LocalNotificationService {
       log('Error resizing image: $e');
     }
     return null;
+  }
+
+  Future<Widget> getInitialPage() async {
+    final NotificationAppLaunchDetails? appLaunchDetails =
+        await _flutterLocalNotificationsPlugin
+            .getNotificationAppLaunchDetails();
+    if (appLaunchDetails?.didNotificationLaunchApp ?? false) {
+      RecipeService recipeService = RecipeService();
+      var mealResponse = await recipeService.getMeal(
+          mealName: appLaunchDetails!.notificationResponse!.payload!);
+      return RecipePage(
+        selectedNotificationMeal: mealResponse.meals[0],
+      );
+    } else {
+      return const HomePage();
+    }
+  }
+
+  void _ondidRecieveNotificationHandler(NotificationResponse details) {
+    selectedNotificationStream.add(details.payload);
   }
 }
