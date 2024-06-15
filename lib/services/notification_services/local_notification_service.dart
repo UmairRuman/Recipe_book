@@ -15,11 +15,9 @@ import 'package:timezone/timezone.dart' as tz;
 class LocalNotificationService {
   static const _notificationId = 1;
   static const _channelId = 'Schedule_1', _channelName = 'Recipe Timer';
-  static const _timerBody = 'Time\'s Up!';
   static LocalNotificationService? _instance;
   final StreamController<String?> selectedNotificationStream =
       StreamController<String?>.broadcast();
-  Meal? selectedNotificationMeal;
 
   LocalNotificationService._();
   factory LocalNotificationService() =>
@@ -51,7 +49,8 @@ class LocalNotificationService {
     return false;
   }
 
-  void setTimerNotification(DateTime dateTime, Meal meal) async {
+  void setTimerNotification(
+      DateTime dateTime, Meal meal, String message) async {
     //set the large icon with the meal image
     final largeIcon =
         ByteArrayAndroidBitmap(await _getByteArrayFromUrl(meal.strMealThumb));
@@ -66,7 +65,7 @@ class LocalNotificationService {
     await _flutterLocalNotificationsPlugin.zonedSchedule(
         _notificationId,
         meal.strMeal,
-        _timerBody,
+        message,
         tz.TZDateTime.from(dateTime, tz.getLocation('Asia/Karachi')),
         notificationDetails,
         uiLocalNotificationDateInterpretation:

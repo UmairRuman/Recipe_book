@@ -1,19 +1,14 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:recipe_book/pages/recipe_page/widgets/timer_message_dialog.dart';
 import 'package:recipe_book/services/database_services/database.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 import 'package:recipe_book/services/notification_services/local_notification_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class RecipeController extends GetxController {
-  static const _videoError = 'No Video Available';
-  static const _recipeError = 'No Recipe Available';
-
   final DBHelper _db = DBHelper();
-  var favourtieIcon = const Icon(Icons.favorite_border_outlined).obs;
-
+  final TextEditingController timerMessageController = TextEditingController();
   void scheduleNotification(BuildContext context, Meal meal) async {
     var time = await showTimePicker(
       context: context,
@@ -21,6 +16,7 @@ class RecipeController extends GetxController {
       initialEntryMode: TimePickerEntryMode.dialOnly,
     );
     if (await LocalNotificationService().requestNotificationPermission()) {
+      const defaultTimerMessage = 'Time\'s up!';
       if (time != null) {
         var currentDateTime = DateTime.now();
         var scheduledTime = DateTime(
@@ -32,7 +28,18 @@ class RecipeController extends GetxController {
             currentDateTime.second,
             currentDateTime.millisecond,
             currentDateTime.microsecond);
-        LocalNotificationService().setTimerNotification(scheduledTime, meal);
+        String message = await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => const TimerMessageDialog(),
+        );
+        if (message.isEmpty) {
+          LocalNotificationService()
+              .setTimerNotification(scheduledTime, meal, defaultTimerMessage);
+        } else {
+          LocalNotificationService()
+              .setTimerNotification(scheduledTime, meal, message);
+        }
       }
     }
   }
@@ -63,19 +70,16 @@ class RecipeController extends GetxController {
     Uri uri = Uri.parse(videoUrl);
     if (!await launchUrl(uri)) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text(_videoError)));
+          .showSnackBar(const SnackBar(content: Text('No Video Available')));
     }
   }
 
   void openOriginalRecipe(BuildContext context, String recipeUrl) async {
     Uri uri = Uri.parse(recipeUrl);
-    if (!await launchUrl(uri)) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text(_recipeError)));
-    }
+    if (!await launchUrl(uri)) {}
   }
 
-  void addMealToFavouruites(Meal meal) {
+  void addMealToFavourites(Meal meal) {
     _db.insert(meal);
   }
 
@@ -87,18 +91,14 @@ class RecipeController extends GetxController {
     return _db.isFavourite(meal);
   }
 
-  void onFavouriteIconTap(Meal meal) {
-    if (_db.isFavourite(meal)) {
-      log('[removed from favourites]');
-      _db.delete(meal);
-      favourtieIcon.value = const Icon(Icons.favorite_border_outlined);
-    } else {
-      log('[added to favourites]');
-      _db.insert(meal);
-      favourtieIcon.value = const Icon(
-        Icons.favorite,
-        color: Colors.red,
-      );
-    }
+  void onOkBtnTap() {
+    Get.back(result: timerMessageController.text);
+    timerMessageController.clear();
+  }
+
+  @override
+  void onClose() {
+    timerMessageController.dispose();
+    super.onClose();
   }
 }
