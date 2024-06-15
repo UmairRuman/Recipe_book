@@ -233,6 +233,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  easy_search_bar:
+    dependency: "direct main"
+    description:
+      name: easy_search_bar
+      sha256: b20343be8ab94ed9e1550cf8cbd5323c344bd9b58b9319fb6e62d75395c0bcaa
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.0"
   ejson:
     dependency: transitive
     description:
@@ -753,10 +761,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: ceb2625f0c24ade6ef6778d1de0b2e44f2db71fded235eb52295247feba8c5cf
+      sha256: "17cd5e205ea615e2c6ea7a77323a11712dffa0720a8a90540db57a01347f9ad9"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.3"
+    version: "6.3.2"
   url_launcher_ios:
     dependency: transitive
     description:
@@ -879,4 +887,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.4.1 <4.0.0"
-  flutter: ">=3.22.0"
+  flutter: ">=3.19.0"

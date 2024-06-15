@@ -5,7 +5,7 @@ import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart
 import 'package:recipe_book/pages/home_page/widgets/cache_receipes.dart';
 import 'package:recipe_book/pages/home_page/widgets/category_list.dart';
 import 'package:recipe_book/pages/home_page/widgets/fav_list.dart';
-import 'package:recipe_book/pages/home_page/widgets/search_bar.dart';
+import 'package:recipe_book/pages/home_page/widgets/search_bar/Widget/search_bar_widget.dart';
 
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
@@ -13,18 +13,17 @@ class HomePage extends GetView<HomePageController> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
-    final searchBarHeight = height * 0.1;
+    final width = MediaQuery.sizeOf(context).width;
     final categoryItemHeight = height * 0.25;
     final favouriteReciepeItemHeight = height * 0.25;
     final cacheReceipeItemHeight = height * 0.40;
     return Scaffold(
+      appBar: PreferredSize(
+          preferredSize: Size(width, 56), child: const HomeSearchBarWidget()),
       body: ListView.builder(
-        itemCount: 5,
+        itemCount: 4,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
-            return SizedBox(
-                height: searchBarHeight, child: const HomeSearchBarWidget());
-          } else if (index == 1) {
             return SizedBox(
               height: categoryItemHeight,
               child: Obx(
@@ -39,11 +38,11 @@ class HomePage extends GetView<HomePageController> {
                 },
               ),
             );
-          } else if (index == 2) {
+          } else if (index == 1) {
             return SizedBox(
                 height: favouriteReciepeItemHeight,
                 child: const FavouriteReciepeList());
-          } else if (index == 3) {
+          } else if (index == 2) {
             return const CacheReceipesTitle();
           } else {
             return SizedBox(
