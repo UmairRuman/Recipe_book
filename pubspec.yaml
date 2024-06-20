@@ -43,6 +43,7 @@ dependencies:
   url_launcher: ^6.3.0
   timezone: ^0.9.3
   image: ^4.2.0
+  easy_search_bar: ^2.5.0
 
 dev_dependencies:
   flutter_test:
