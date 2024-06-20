@@ -7,8 +7,19 @@ import 'package:recipe_book/services/notification_services/local_notification_se
 import 'package:url_launcher/url_launcher.dart';
 
 class RecipeController extends GetxController {
+  //data members
   final DBHelper _db = DBHelper();
   final TextEditingController timerMessageController = TextEditingController();
+  static const iconsChache = <FavouriteIcons, Icon>{
+    FavouriteIcons.unfavourite: Icon(Icons.favorite_border_rounded),
+    FavouriteIcons.favourite: Icon(
+      Icons.favorite_outlined,
+      color: Colors.red,
+    )
+  };
+  var favouriteIcon = iconsChache[FavouriteIcons.unfavourite]!.obs;
+
+  //functions
   void scheduleNotification(BuildContext context, Meal meal) async {
     var time = await showTimePicker(
       context: context,
@@ -72,7 +83,9 @@ class RecipeController extends GetxController {
     return input.replaceAll(RegExp(pattern), '');
   }
 
-  void navigateBackToCategoryPage() => Get.back();
+  navigateBackToCategoryPage() {
+    return Get.back();
+  }
 
   void openYoutubeVideo(BuildContext context, String videoUrl) async {
     Uri uri = Uri.parse(videoUrl);
@@ -87,21 +100,24 @@ class RecipeController extends GetxController {
     if (!await launchUrl(uri)) {}
   }
 
-  void addMealToFavourites(Meal meal) {
-    _db.insert(meal);
+  void onFavouriteIconTap(Meal meal) {
+    Meal currentMeal = meal.copiedObject;
+    if (_db.isFavourite(meal.idMeal)) {
+      _db.delete(currentMeal.idMeal);
+      favouriteIcon.value = iconsChache[FavouriteIcons.unfavourite]!;
+    } else {
+      _db.insert(currentMeal);
+      favouriteIcon.value = iconsChache[FavouriteIcons.favourite]!;
+    }
   }
 
-  void removeMealFromFavourites(Meal meal) {
-    _db.delete(meal);
+  void checkForFavouriteIcon(Meal meal) {
+    if (_db.isFavourite(meal.idMeal)) {
+      favouriteIcon.value = iconsChache[FavouriteIcons.favourite]!;
+    } else {
+      favouriteIcon.value = iconsChache[FavouriteIcons.unfavourite]!;
+    }
   }
-
-  bool isFavourite(Meal meal) {
-    return _db.isFavourite(meal);
-  }
-
-  int totalFavourites() => _db.favouriteMeals().length;
-
-  void deleteAllMeals() => _db.deleteAllMeals();
 
   void onOkBtnTap() {
     Get.back(result: timerMessageController.text);
@@ -113,4 +129,9 @@ class RecipeController extends GetxController {
     timerMessageController.dispose();
     super.onClose();
   }
+}
+
+enum FavouriteIcons {
+  favourite,
+  unfavourite,
 }

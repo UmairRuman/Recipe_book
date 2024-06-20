@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:get/get.dart';
 import 'package:recipe_book/pages/category_page/model/category_model.dart';
 import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
 import 'package:recipe_book/pages/home_page/model/categories_list_model.dart';
-import 'package:recipe_book/pages/recipe_page/model/meals_api_model.dart';
 import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
+import 'package:recipe_book/services/database_services/database.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 import 'package:recipe_book/services/meal_services/category_service/category_service.dart';
 import 'package:recipe_book/services/meal_services/recipe_service/recipe_service.dart';
@@ -15,7 +16,7 @@ class HomePageController extends GetxController {
   HomePageController({required this.selectedNotificationStream});
   final StreamController<String?> selectedNotificationStream;
   var datafetched = false.obs;
-  MealsModel? randomMeal;
+  Meal? randomMeal;
   var randomMealReceived = false.obs;
   dynamic categories;
 
@@ -37,6 +38,11 @@ class HomePageController extends GetxController {
   getRandomDish() async {
     randomMeal = await RandomReceipeService().getRandomMeal();
     randomMealReceived.value = true;
+  }
+
+  get favouriteMeals {
+    log(DBHelper().favouriteMeals().toString());
+    return DBHelper().favouriteMeals();
   }
 
   @override

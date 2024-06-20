@@ -9,6 +9,7 @@ class IngredientsQuantityTile extends StatelessWidget {
     final Size(:height) = MediaQuery.sizeOf(context);
     final style = TextStyle(color: Colors.black, fontSize: height * 0.02);
     return Material(
+      color: Colors.white,
       child: ListTile(
         leading: Text(
           ingredient,

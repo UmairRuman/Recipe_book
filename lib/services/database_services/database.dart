@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:realm/realm.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 
@@ -15,39 +17,42 @@ class DBHelper {
   void insert(Meal meal) {
     _databse.write(
       () {
-        _databse.add(meal);
+        _databse.add<Meal>(meal);
       },
     );
   }
 
-  void update(Meal meal) {
-    _databse.write(
-      () {
-        _databse.add(meal, update: true);
-      },
-    );
-  }
-
-  void delete(Meal meal) {
-    _databse.write(
-      () {
-        _databse.delete(meal);
-      },
-    );
+  void delete(String mealId) {
+    log(mealId);
+    var foundObject = _databse.find<Meal>(mealId);
+    if (foundObject != null) {
+      _databse.write(
+        () {
+          _databse.delete<Meal>(foundObject);
+        },
+      );
+    }
   }
 
   List<Meal> favouriteMeals() {
     return _databse.all<Meal>().toList();
   }
 
-  bool isFavourite(Meal meal) {
+  bool isFavourite(String mealId) {
     final meals = _databse.all<Meal>().toList();
     //If meals is empty means there is no favourite
     if (meals.isEmpty) {
       return false;
     } else {
       //check if meal is present and return the result
-      return meals.contains(meal);
+      bool isPresent = false;
+      for (var element in meals) {
+        if (element.idMeal == mealId) {
+          isPresent = true;
+          break;
+        }
+      }
+      return isPresent;
     }
   }
 

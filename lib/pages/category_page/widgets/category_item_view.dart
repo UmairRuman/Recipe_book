@@ -1,11 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/pages/category_page/controller/category_controller.dart';
 import 'package:recipe_book/pages/category_page/model/category_model.dart';
 
 class CategoryItemView extends GetView<CategoryController> {
-  const CategoryItemView({super.key, required this.category});
+  const CategoryItemView(
+      {super.key, required this.category, required this.index});
   final CategoryItem category;
+  final int index;
   static const shadows = [
     BoxShadow(
         color: Colors.black54,
@@ -26,6 +31,9 @@ class CategoryItemView extends GetView<CategoryController> {
 
   @override
   Widget build(BuildContext context) {
+    SchedulerBinding.instance.addPostFrameCallback(
+      (timeStamp) => controller.checkForFavouriteIcon(category.idMeal, index),
+    );
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final recipeStyle = TextStyle(
         color: Colors.black,
@@ -61,7 +69,15 @@ class CategoryItemView extends GetView<CategoryController> {
                             top: constraints.maxHeight * favIconSpacingFromTop,
                             right:
                                 constraints.maxWidth * favIconSpacingFromRight,
-                            child: const Icon(Icons.favorite_outline))
+                            child: IconButton(
+                                onPressed: () {
+                                  log(category.toString());
+                                  controller.onFavouriteIconTap(
+                                      category, index);
+                                },
+                                icon: Obx(
+                                  () => controller.iconsList[index],
+                                )))
                       ],
                     ),
                   ),

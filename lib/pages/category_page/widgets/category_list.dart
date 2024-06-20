@@ -15,6 +15,7 @@ class CategoryList extends StatelessWidget {
         padding: EdgeInsets.only(top: height * 0.02),
         child: CategoryItemView(
           category: categories[index],
+          index: index,
         ),
       ),
     ));

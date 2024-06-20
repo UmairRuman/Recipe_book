@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:recipe_book/pages/recipe_page/model/meals_api_model.dart';
 import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
+import 'package:recipe_book/services/database_services/meal.dart';
 
 class RandomReceipeItem extends StatelessWidget {
   const RandomReceipeItem({super.key, required this.meal});
-  final MealsModel meal;
+  final Meal meal;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);

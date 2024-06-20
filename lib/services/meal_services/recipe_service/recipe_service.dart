@@ -1,5 +1,5 @@
-import 'package:recipe_book/pages/recipe_page/model/meals_api_model.dart';
 import 'package:recipe_book/pages/recipe_page/model/meals_response.dart';
+import 'package:recipe_book/services/database_services/meal.dart';
 import 'package:recipe_book/services/meal_services/client.dart';
 
 class RecipeService extends ApiService {
@@ -17,8 +17,8 @@ class RandomReceipeService extends ApiService {
   @override
   String get apiUrl => '/random.php';
 
-  Future<MealsModel> getRandomMeal() async {
+  Future<Meal> getRandomMeal() async {
     var map = await fetch();
-    return MealsModel.fromMap(map['meals'][0]);
+    return Meal.fromMap(map['meals'][0]);
   }
 }

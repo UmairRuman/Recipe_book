@@ -42,7 +42,9 @@ class HomePage extends GetView<HomePageController> {
           } else if (index == 2) {
             return SizedBox(
                 height: favouriteReciepeItemHeight,
-                child: const FavouriteReciepeList());
+                child: FavouriteReciepeList(
+                  favMeals: controller.favouriteMeals,
+                ));
           } else if (index == 3) {
             return const CacheReceipesTitle();
           } else {

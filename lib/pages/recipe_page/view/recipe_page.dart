@@ -20,13 +20,21 @@ class RecipePage extends GetView<RecipeController> {
     } else {
       meal = Get.arguments;
     }
+    controller.checkForFavouriteIcon(meal);
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final style = TextStyle(
       color: Colors.black,
       fontSize: height * 0.03,
     );
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: controller.navigateBackToCategoryPage,
+            icon: const Icon(Icons.arrow_back)),
+        scrolledUnderElevation: 0.0,
+        elevation: 0.0,
+        backgroundColor: Colors.white,
         actions: [
           IconButton(
               onPressed: () {
@@ -37,10 +45,10 @@ class RecipePage extends GetView<RecipeController> {
               )),
           IconButton(
               onPressed: () {
-                //add to favourites
+                controller.onFavouriteIconTap(meal);
               },
-              icon: const Icon(
-                Icons.favorite_outline,
+              icon: Obx(
+                () => controller.favouriteIcon.value,
               )),
         ],
       ),
@@ -80,21 +88,9 @@ class RecipePage extends GetView<RecipeController> {
                 ),
               ),
             ),
-            if (meal.strSource!.isNotEmpty) LinkWidget(source: meal.strSource!),
+            if (meal.strSource != null) LinkWidget(source: meal.strSource!),
           ],
         ),
-      ),
-      floatingActionButton: ButtonBar(
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(controller.totalFavourites().toString())));
-            },
-            child: const Text('length'),
-          ),
-          FloatingActionButton(onPressed: controller.deleteAllMeals),
-        ],
       ),
     );
   }

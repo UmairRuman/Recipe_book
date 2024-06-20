@@ -46,17 +46,4 @@ class CategoryItem {
   @override
   String toString() =>
       'CategoryModel(strMeal: $strMeal, strMealThumb: $strMealThumb, idMeal: $idMeal)';
-
-  @override
-  bool operator ==(covariant CategoryItem other) {
-    if (identical(this, other)) return true;
-
-    return other.strMeal == strMeal &&
-        other.strMealThumb == strMealThumb &&
-        other.idMeal == idMeal;
-  }
-
-  @override
-  int get hashCode =>
-      strMeal.hashCode ^ strMealThumb.hashCode ^ idMeal.hashCode;
 }
