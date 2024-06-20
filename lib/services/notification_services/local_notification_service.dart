@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
 
@@ -9,7 +10,6 @@ import 'package:image/image.dart' as img;
 import 'package:recipe_book/pages/home_page/view/home_page.dart';
 import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
-import 'package:recipe_book/services/meal_services/recipe_service/recipe_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class LocalNotificationService {
@@ -63,15 +63,16 @@ class LocalNotificationService {
         NotificationDetails(android: androidNotificationDetails);
     //schedule Notification
     await _flutterLocalNotificationsPlugin.zonedSchedule(
-        _notificationId,
-        meal.strMeal,
-        message,
-        tz.TZDateTime.from(dateTime, tz.getLocation('Asia/Karachi')),
-        notificationDetails,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        payload: meal.strMeal);
+      _notificationId,
+      meal.strMeal,
+      message,
+      tz.TZDateTime.from(dateTime, tz.getLocation('Asia/Karachi')),
+      notificationDetails,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      payload: meal.toMap().toString(),
+    );
   }
 
   Future<Uint8List> _getByteArrayFromUrl(String url) async {
@@ -131,18 +132,16 @@ class LocalNotificationService {
         await _flutterLocalNotificationsPlugin
             .getNotificationAppLaunchDetails();
     if (appLaunchDetails?.didNotificationLaunchApp ?? false) {
-      RecipeService recipeService = RecipeService();
-      var mealResponse = await recipeService.getMeal(
-          mealName: appLaunchDetails!.notificationResponse!.payload!);
-      return RecipePage(
-        selectedNotificationMeal: mealResponse.meals[0],
-      );
+      Map<String, dynamic> meal =
+          jsonDecode(appLaunchDetails!.notificationResponse!.payload!);
+      return RecipePage(selectedNotificationMeal: Meal.fromMap(meal));
     } else {
       return const HomePage();
     }
   }
 
   void _ondidRecieveNotificationHandler(NotificationResponse details) {
+    details.payload!.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
     selectedNotificationStream.add(details.payload);
   }
 }

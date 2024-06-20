@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:recipe_book/pages/category_page/model/category_model.dart';
@@ -6,6 +7,7 @@ import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
 import 'package:recipe_book/pages/home_page/model/categories_list_model.dart';
 import 'package:recipe_book/pages/recipe_page/model/meals_api_model.dart';
 import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
+import 'package:recipe_book/services/database_services/meal.dart';
 import 'package:recipe_book/services/meal_services/category_service/category_service.dart';
 import 'package:recipe_book/services/meal_services/recipe_service/recipe_service.dart';
 
@@ -52,10 +54,10 @@ class HomePageController extends GetxController {
   void _selectedNotificationHandler() {
     selectedNotificationStream.stream.listen(
       (String? payLoad) async {
-        final RecipeService recipeService = RecipeService();
-        var mealResponse = await recipeService.getMeal(mealName: payLoad!);
+        payLoad = payLoad!.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
+        Map<String, dynamic> meal = jsonDecode(payLoad);
         await Get.toNamed(RecipePage.pageAddress,
-            arguments: mealResponse.meals[0]);
+            arguments: Meal.fromMap(meal));
       },
     );
   }

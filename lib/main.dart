@@ -21,9 +21,7 @@ void main() async {
   Get.put(HomePageController(
       selectedNotificationStream:
           localNotifications.selectedNotificationStream));
-  runApp(MyApp(
-    initialPage: initialPage,
-  ));
+  runApp(MyApp(initialPage: initialPage));
 }
 
 class MyApp extends StatelessWidget {

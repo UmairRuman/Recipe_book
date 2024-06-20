@@ -4,7 +4,7 @@ import 'package:recipe_book/services/database_services/meal.dart';
 class DBHelper {
   static DBHelper? _instance;
   static Realm? _db;
-  static const schemaVersion = 2;
+  static const schemaVersion = 3;
   DBHelper._();
 
   factory DBHelper() => _instance ??= DBHelper._();
@@ -49,5 +49,13 @@ class DBHelper {
       //check if meal is present and return the result
       return meals.contains(meal);
     }
+  }
+
+  void deleteAllMeals() {
+    _databse.write(
+      () {
+        _databse.deleteAll<Meal>();
+      },
+    );
   }
 }

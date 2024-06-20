@@ -80,9 +80,21 @@ class RecipePage extends GetView<RecipeController> {
                 ),
               ),
             ),
-            if (meal.strSource.isNotEmpty) LinkWidget(source: meal.strSource),
+            if (meal.strSource!.isNotEmpty) LinkWidget(source: meal.strSource!),
           ],
         ),
+      ),
+      floatingActionButton: ButtonBar(
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(controller.totalFavourites().toString())));
+            },
+            child: const Text('length'),
+          ),
+          FloatingActionButton(onPressed: controller.deleteAllMeals),
+        ],
       ),
     );
   }

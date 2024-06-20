@@ -49,19 +49,27 @@ class RecipeController extends GetxController {
     final List<String> ingredientsList = [], quantityList = [];
     mealMap.forEach(
       (key, value) {
-        if (key.startsWith('strIng')) {
-          if ((value as String).isNotEmpty) {
-            ingredientsList.add(value);
+        if (key.startsWith('"strIng')) {
+          if ((value as String) != '""') {
+            ingredientsList.add(trimQuotes(value));
           }
         }
-        if (key.startsWith('strMeasure')) {
-          if ((value as String).isNotEmpty) {
-            quantityList.add(value);
+        if (key.startsWith('"strMeasure')) {
+          if ((value as String) != '""') {
+            quantityList.add(trimQuotes(value));
           }
         }
       },
     );
     return (ingredientsList, quantityList);
+  }
+
+  // function to remove double quotation marks from strt and end of the string
+  String trimQuotes(String input) {
+    // pattern
+    String pattern = r'^"+|"+$';
+    // method
+    return input.replaceAll(RegExp(pattern), '');
   }
 
   void navigateBackToCategoryPage() => Get.back();
@@ -90,6 +98,10 @@ class RecipeController extends GetxController {
   bool isFavourite(Meal meal) {
     return _db.isFavourite(meal);
   }
+
+  int totalFavourites() => _db.favouriteMeals().length;
+
+  void deleteAllMeals() => _db.deleteAllMeals();
 
   void onOkBtnTap() {
     Get.back(result: timerMessageController.text);
