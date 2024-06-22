@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:get/get.dart';
 import 'package:recipe_book/pages/category_page/model/category_model.dart';
@@ -19,6 +18,9 @@ class HomePageController extends GetxController {
   Meal? randomMeal;
   var randomMealReceived = false.obs;
   dynamic categories;
+  var favouriteMealsList = <Meal>[];
+  var favouritesFetched = false.obs;
+  var _pageResponse = 0;
 
   loadData() async {
     categories = await CategoriesService().fetchCategories();
@@ -26,9 +28,15 @@ class HomePageController extends GetxController {
   }
 
   pushCategoryPage(String categoryName) async {
+    favouritesFetched.value = false;
     List<CategoryItem> category =
         await CategoryService().fetchCategory(categoryName);
-    Get.toNamed(CategoryPage.pageAddress, arguments: category);
+    _pageResponse =
+        await Get.toNamed(CategoryPage.pageAddress, arguments: category);
+    if (favouriteMealsList.length != _pageResponse) {
+      favouriteMealsList = DBHelper().favouriteMeals();
+    }
+    favouritesFetched.value = true;
   }
 
   List<CategoriesModel> getCategoryList() {
@@ -40,15 +48,12 @@ class HomePageController extends GetxController {
     randomMealReceived.value = true;
   }
 
-  get favouriteMeals {
-    log(DBHelper().favouriteMeals().toString());
-    return DBHelper().favouriteMeals();
-  }
-
   @override
   void onInit() {
     super.onInit();
     _selectedNotificationHandler();
+    favouriteMealsList = DBHelper().favouriteMeals();
+    favouritesFetched.value = true;
   }
 
   @override
@@ -66,5 +71,25 @@ class HomePageController extends GetxController {
             arguments: Meal.fromMap(meal));
       },
     );
+  }
+
+  onSuggestionTap(String suggestion) async {
+    favouritesFetched.value = false;
+    var mealResponse = await RecipeService().getMeal(mealName: suggestion);
+    _pageResponse = await Get.toNamed(RecipePage.pageAddress,
+        arguments: mealResponse.meals[0].copiedObject);
+    if (favouriteMealsList.length != _pageResponse) {
+      favouriteMealsList = DBHelper().favouriteMeals();
+    }
+    favouritesFetched.value = true;
+  }
+
+  onMealTap(Meal meal) async {
+    favouritesFetched.value = false;
+    _pageResponse = await Get.toNamed(RecipePage.pageAddress, arguments: meal);
+    if (favouriteMealsList.length != _pageResponse) {
+      favouriteMealsList = DBHelper().favouriteMeals();
+    }
+    favouritesFetched.value = true;
   }
 }

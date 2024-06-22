@@ -17,25 +17,33 @@ class CategoryController extends GetxController {
     )
   };
   var iconsList = <Icon>[].obs;
-  void navigateToRecipePage({required String mealName}) async {
+
+  //go to recipe page on recipe click
+  navigateToRecipePage(mealName, int index, VoidCallback stateFunc) async {
+    var favouritesLength = DBHelper().favouriteMeals().length;
     RecipeService recipeService = RecipeService();
     var mealResponse = await recipeService.getMeal(mealName: mealName);
-    Get.toNamed(
+    var response = await Get.toNamed(
       RecipePage.pageAddress,
       arguments: mealResponse.meals[0],
     );
+    if (response != favouritesLength) {
+      stateFunc();
+    }
   }
 
-  void onFavouriteIconTap(CategoryItem category, int index) async {
+  //add or remove on favourite icon tap
+  onFavouriteIconTap(CategoryItem category, int index) async {
     if (_db.isFavourite(category.idMeal)) {
       _db.delete(category.idMeal);
       iconsList[index] = _iconsChache[FavouriteIcons.unfavourite]!;
+      iconsList.refresh();
     } else {
+      iconsList[index] = _iconsChache[FavouriteIcons.favourite]!;
+      iconsList.refresh();
       var meal = await _convertCategoryToMeal(category.strMeal);
       _db.insert(meal.copiedObject);
-      iconsList[index] = _iconsChache[FavouriteIcons.favourite]!;
     }
-    iconsList.refresh();
   }
 
   Future<Meal> _convertCategoryToMeal(String mealName) async {
@@ -43,7 +51,7 @@ class CategoryController extends GetxController {
     return mealResposne.meals[0];
   }
 
-  void checkForFavouriteIcon(String mealId, int index) {
+  checkForFavouriteIcon(String mealId, int index) {
     if (_db.isFavourite(mealId)) {
       iconsList[index] = _iconsChache[FavouriteIcons.favourite]!;
     } else {

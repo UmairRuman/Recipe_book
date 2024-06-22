@@ -8,8 +8,8 @@ class CategoryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size(:height) = MediaQuery.sizeOf(context);
-    return SliverList(
-        delegate: SliverChildBuilderDelegate(
+    return ListView.custom(
+        childrenDelegate: SliverChildBuilderDelegate(
       childCount: categories.length,
       (context, index) => Padding(
         padding: EdgeInsets.only(top: height * 0.02),

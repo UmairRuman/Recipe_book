@@ -1,3 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/timer_message_dialog.dart';
@@ -55,13 +59,12 @@ class RecipeController extends GetxController {
     }
   }
 
-  (List<String>, List<String>) ingredientsAndQuantityList(
-      Map<String, dynamic> mealMap) {
+  ingredientsAndQuantityList(Map<String, dynamic> mealMap) {
     final List<String> ingredientsList = [], quantityList = [];
     mealMap.forEach(
       (key, value) {
         if (key.startsWith('"strIng')) {
-          if ((value as String) != '""') {
+          if ((value as String) != '""' && value != '"null"') {
             ingredientsList.add(trimQuotes(value));
           }
         }
@@ -72,11 +75,12 @@ class RecipeController extends GetxController {
         }
       },
     );
+    log('ingredients length : ${ingredientsList.length} , quantity list : ${quantityList.length}');
     return (ingredientsList, quantityList);
   }
 
   // function to remove double quotation marks from strt and end of the string
-  String trimQuotes(String input) {
+  trimQuotes(String input) {
     // pattern
     String pattern = r'^"+|"+$';
     // method
@@ -84,10 +88,10 @@ class RecipeController extends GetxController {
   }
 
   navigateBackToCategoryPage() {
-    return Get.back();
+    return Get.back(result: DBHelper().favouriteMeals().length);
   }
 
-  void openYoutubeVideo(BuildContext context, String videoUrl) async {
+  openYoutubeVideo(BuildContext context, String videoUrl) async {
     Uri uri = Uri.parse(videoUrl);
     if (!await launchUrl(uri)) {
       ScaffoldMessenger.of(context)
@@ -95,12 +99,12 @@ class RecipeController extends GetxController {
     }
   }
 
-  void openOriginalRecipe(BuildContext context, String recipeUrl) async {
+  openOriginalRecipe(BuildContext context, String recipeUrl) async {
     Uri uri = Uri.parse(recipeUrl);
     if (!await launchUrl(uri)) {}
   }
 
-  void onFavouriteIconTap(Meal meal) {
+  onFavouriteIconTap(Meal meal) {
     Meal currentMeal = meal.copiedObject;
     if (_db.isFavourite(meal.idMeal)) {
       _db.delete(currentMeal.idMeal);
@@ -111,7 +115,7 @@ class RecipeController extends GetxController {
     }
   }
 
-  void checkForFavouriteIcon(Meal meal) {
+  checkForFavouriteIcon(Meal meal) {
     if (_db.isFavourite(meal.idMeal)) {
       favouriteIcon.value = iconsChache[FavouriteIcons.favourite]!;
     } else {
@@ -119,7 +123,7 @@ class RecipeController extends GetxController {
     }
   }
 
-  void onOkBtnTap() {
+  onOkBtnTap() {
     Get.back(result: timerMessageController.text);
     timerMessageController.clear();
   }

@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/ingredeints_quantity_list.dart';
 import 'package:recipe_book/pages/recipe_page/widgets/ingredient_and_quantity_design.dart';
-import 'package:recipe_book/pages/recipe_page/widgets/recipe_tutorial_design.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 
 class RecipePage extends GetView<RecipeController> {
@@ -12,6 +11,8 @@ class RecipePage extends GetView<RecipeController> {
   static const pageAddress = '/recipe';
   static const instructions = 'Instructions :';
   static const originalRecipeLink = 'Recipe link :';
+  static const youtubeIconSize = 18.0;
+  static const youtubeImage = 'assets/images/youtube.png';
   @override
   Widget build(BuildContext context) {
     final Meal meal;
@@ -29,6 +30,12 @@ class RecipePage extends GetView<RecipeController> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        title: FittedBox(
+            child: Text(
+          meal.strMeal,
+          style: style.copyWith(fontWeight: FontWeight.bold),
+        )),
+        centerTitle: true,
         leading: IconButton(
             onPressed: controller.navigateBackToCategoryPage,
             icon: const Icon(Icons.arrow_back)),
@@ -42,6 +49,14 @@ class RecipePage extends GetView<RecipeController> {
               },
               icon: const Icon(
                 Icons.timer_outlined,
+              )),
+          IconButton(
+              onPressed: () {
+                controller.openYoutubeVideo(context, meal.strYoutube);
+              },
+              icon: Image.asset(
+                youtubeImage,
+                height: youtubeIconSize,
               )),
           IconButton(
               onPressed: () {
@@ -62,10 +77,6 @@ class RecipePage extends GetView<RecipeController> {
                 radius: height * 0.1,
                 backgroundImage: NetworkImage(meal.strMealThumb),
               ),
-            ),
-            RecipeAndTutorialDesign(
-              recipeName: meal.strMeal,
-              videoUrl: meal.strYoutube,
             ),
             const IngredientAndQuantityHeadings(),
             IngredientsQuantityList(

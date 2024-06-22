@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,8 +14,7 @@ class HomePage extends GetView<HomePageController> {
   static const pageAddress = '/';
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
-    final width = MediaQuery.sizeOf(context).width;
+    final Size(:width, :height) = MediaQuery.sizeOf(context);
     final categoryItemHeight = height * 0.25;
     final favouriteReciepeItemHeight = height * 0.25;
     final cacheReceipeItemHeight = height * 0.40;
@@ -39,12 +40,24 @@ class HomePage extends GetView<HomePageController> {
               ),
             );
           } else if (index == 1) {
-            return SizedBox(
-                height: favouriteReciepeItemHeight,
-                child: FavouriteReciepeList(
-                  favMeals: controller.favouriteMeals,
-                ));
-          } else if (index == 3) {
+            return Obx(
+              () {
+                if (controller.favouritesFetched.isFalse) {
+                  return SizedBox(
+                    height: favouriteReciepeItemHeight,
+                    child: const CupertinoActivityIndicator(),
+                  );
+                } else {
+                  log('favourite list built');
+                  return SizedBox(
+                    height: favouriteReciepeItemHeight,
+                    child: FavouriteReciepeList(
+                        favMeals: controller.favouriteMealsList),
+                  );
+                }
+              },
+            );
+          } else if (index == 2) {
             return const CacheReceipesTitle();
           } else {
             return SizedBox(

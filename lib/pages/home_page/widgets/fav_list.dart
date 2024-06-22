@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
+import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 
 class FavouriteReciepeList extends StatelessWidget {
@@ -58,7 +58,7 @@ class FavouriteReciepeList extends StatelessWidget {
   }
 }
 
-class FavListItem extends StatelessWidget {
+class FavListItem extends GetView<HomePageController> {
   const FavListItem({super.key, required this.favouriteItem});
   final Meal favouriteItem;
   @override
@@ -73,8 +73,7 @@ class FavListItem extends StatelessWidget {
       padding: EdgeInsets.all(padding),
       child: GestureDetector(
         onTap: () {
-          Get.toNamed(RecipePage.pageAddress,
-              arguments: favouriteItem.copiedObject);
+          controller.onMealTap(favouriteItem.copiedObject);
         },
         child: DecoratedBox(
           decoration: BoxDecoration(

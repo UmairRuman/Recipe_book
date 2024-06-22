@@ -4,8 +4,9 @@ class IngredientAndQuantityHeadings extends StatelessWidget {
   const IngredientAndQuantityHeadings({super.key});
   static const ingredients = 'Ingredients';
   static const quantity = 'Quantity';
-  static const ingredientsAndQuantityPaddingFromLeft = 0.05;
-  static const ingredientsAndQuantityPaddingFromTop = 0.02;
+  static const rowPaddingFromLeft = 0.05;
+  static const rowPaddingFromTop = 0.02;
+  static const quantityPaddingFromLeft = 0.06;
   @override
   Widget build(BuildContext context) {
     final Size(:width, :height) = MediaQuery.sizeOf(context);
@@ -15,8 +16,7 @@ class IngredientAndQuantityHeadings extends StatelessWidget {
     );
     return Padding(
       padding: EdgeInsets.only(
-          left: width * ingredientsAndQuantityPaddingFromLeft,
-          top: height * ingredientsAndQuantityPaddingFromTop),
+          left: width * rowPaddingFromLeft, top: height * rowPaddingFromTop),
       child: Row(
         children: [
           Expanded(
@@ -30,9 +30,12 @@ class IngredientAndQuantityHeadings extends StatelessWidget {
           ),
           Expanded(
               flex: 10,
-              child: Text(
-                quantity,
-                style: style,
+              child: Padding(
+                padding: EdgeInsets.only(left: width * quantityPaddingFromLeft),
+                child: Text(
+                  quantity,
+                  style: style,
+                ),
               )),
         ],
       ),

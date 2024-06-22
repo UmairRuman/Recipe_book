@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
+import 'package:get/get_state_manager/src/simple/get_view.dart';
+import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 
-class RandomReceipeItem extends StatelessWidget {
+class RandomReceipeItem extends GetView<HomePageController> {
   const RandomReceipeItem({super.key, required this.meal});
   final Meal meal;
   @override
@@ -15,7 +15,9 @@ class RandomReceipeItem extends StatelessWidget {
     final itemTitleFontSize = size.height * 0.04;
     final itemBorderWidth = size.width * 0.004;
     return GestureDetector(
-      onTap: () => Get.toNamed(RecipePage.pageAddress, arguments: meal),
+      onTap: () {
+        controller.onMealTap(meal);
+      },
       child: Padding(
         padding: EdgeInsets.all(itemPadding),
         child: DecoratedBox(

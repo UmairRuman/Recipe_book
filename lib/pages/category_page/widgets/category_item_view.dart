@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:recipe_book/pages/category_page/controller/category_controller.dart';
 import 'package:recipe_book/pages/category_page/model/category_model.dart';
 
-class CategoryItemView extends GetView<CategoryController> {
+class CategoryItemView extends StatefulWidget {
   const CategoryItemView(
       {super.key, required this.category, required this.index});
   final CategoryItem category;
@@ -25,14 +25,23 @@ class CategoryItemView extends GetView<CategoryController> {
   static const avatarRadius = 0.08;
   static const btnText = 'See Recipe';
 
+  @override
+  State<CategoryItemView> createState() => _CategoryItemViewState();
+}
+
+class _CategoryItemViewState extends State<CategoryItemView> {
+  final controller = Get.find<CategoryController>();
+  void rebuildPage() => setState(() {});
   void _onBtnTap() {
-    controller.navigateToRecipePage(mealName: category.strMeal);
+    controller.navigateToRecipePage(
+        widget.category.strMeal, widget.index, rebuildPage);
   }
 
   @override
   Widget build(BuildContext context) {
     SchedulerBinding.instance.addPostFrameCallback(
-      (timeStamp) => controller.checkForFavouriteIcon(category.idMeal, index),
+      (timeStamp) => controller.checkForFavouriteIcon(
+          widget.category.idMeal, widget.index),
     );
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final recipeStyle = TextStyle(
@@ -44,7 +53,7 @@ class CategoryItemView extends GetView<CategoryController> {
         width: width * 0.8,
         height: height * 0.4,
         decoration: BoxDecoration(
-          boxShadow: shadows,
+          boxShadow: CategoryItemView.shadows,
           color: Colors.white,
           borderRadius: BorderRadius.circular(
             width * 0.05,
@@ -60,23 +69,24 @@ class CategoryItemView extends GetView<CategoryController> {
                       alignment: Alignment.center,
                       children: [
                         CircleAvatar(
-                          radius: height * avatarRadius,
+                          radius: height * CategoryItemView.avatarRadius,
                           backgroundImage: NetworkImage(
-                            category.strMealThumb,
+                            widget.category.strMealThumb,
                           ),
                         ),
                         Positioned(
-                            top: constraints.maxHeight * favIconSpacingFromTop,
-                            right:
-                                constraints.maxWidth * favIconSpacingFromRight,
+                            top: constraints.maxHeight *
+                                CategoryItemView.favIconSpacingFromTop,
+                            right: constraints.maxWidth *
+                                CategoryItemView.favIconSpacingFromRight,
                             child: IconButton(
                                 onPressed: () {
-                                  log(category.toString());
+                                  log(widget.category.toString());
                                   controller.onFavouriteIconTap(
-                                      category, index);
+                                      widget.category, widget.index);
                                 },
                                 icon: Obx(
-                                  () => controller.iconsList[index],
+                                  () => controller.iconsList[widget.index],
                                 )))
                       ],
                     ),
@@ -88,11 +98,12 @@ class CategoryItemView extends GetView<CategoryController> {
                   child: LayoutBuilder(
                     builder: (context, constraints) => Padding(
                       padding: EdgeInsets.only(
-                          top: constraints.maxHeight * recipeNamePaddingFromTop,
-                          left:
-                              constraints.maxWidth * recipeNamePaddingFromLeft),
+                          top: constraints.maxHeight *
+                              CategoryItemView.recipeNamePaddingFromTop,
+                          left: constraints.maxWidth *
+                              CategoryItemView.recipeNamePaddingFromLeft),
                       child: Text(
-                        category.strMeal,
+                        widget.category.strMeal,
                         style: recipeStyle,
                       ),
                     ),
@@ -103,7 +114,7 @@ class CategoryItemView extends GetView<CategoryController> {
                 child: Center(
                   child: TextButton(
                     onPressed: _onBtnTap,
-                    child: const Text(btnText),
+                    child: const Text(CategoryItemView.btnText),
                   ),
                 )),
           ],
