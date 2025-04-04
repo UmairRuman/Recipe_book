@@ -25,13 +25,17 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.example.recipe_book"
-    compileSdk = 34
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 35
+    ndkVersion = "28.0.13004108"
 
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17  // Updated to 17
+        targetCompatibility = JavaVersion.VERSION_17  // Updated to 17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"  // Explicitly set Kotlin to 17
     }
 
     defaultConfig {
@@ -60,7 +64,7 @@ flutter {
 }
 
 dependencies{
-     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
+     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
      implementation 'androidx.window:window:1.0.0'
     implementation 'androidx.window:window-java:1.0.0'
 }

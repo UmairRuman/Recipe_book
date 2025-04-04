@@ -68,8 +68,6 @@ class LocalNotificationService {
       message,
       tz.TZDateTime.from(dateTime, tz.getLocation('Asia/Karachi')),
       notificationDetails,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: meal.toMap().toString(),
     );
