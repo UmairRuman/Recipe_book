@@ -1,26 +1,38 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
 import 'package:recipe_book/pages/category_page/controller/category_controller.dart';
 import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
 import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
 import 'package:recipe_book/pages/home_page/view/home_page.dart';
 import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
 import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
+import 'package:recipe_book/pages/splash_screen/splash_screen.dart';
 import 'package:recipe_book/services/notification_services/local_notification_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 
+import 'firebase_options.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Intialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Intialize Local Notifications
   final LocalNotificationService localNotifications =
       LocalNotificationService();
   Widget initialPage = await localNotifications.getInitialPage();
   await localNotifications.initializeNotifications();
   tz.initializeTimeZones();
+  // Dependency Injection
   Get.put(CategoryController());
   Get.put(RecipeController());
-  Get.put(HomePageController(
-      selectedNotificationStream:
-          localNotifications.selectedNotificationStream));
+  Get.put(
+    HomePageController(
+      selectedNotificationStream: localNotifications.selectedNotificationStream,
+    ),
+  );
   runApp(MyApp(initialPage: initialPage));
 }
 
@@ -32,17 +44,19 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       getPages: [
         GetPage(
-          name: HomePage.pageAddress,
-          page: () => const HomePage(),
+          name: AuthenticationPage.pageAdress,
+          page: () => const AuthenticationPage(),
         ),
+        GetPage(
+          name: SplashScreen.pageAdress,
+          page: () => const SplashScreen(),
+        ),
+        GetPage(name: HomePage.pageAddress, page: () => const HomePage()),
         GetPage(
           name: CategoryPage.pageAddress,
           page: () => const CategoryPage(),
         ),
-        GetPage(
-          name: RecipePage.pageAddress,
-          page: () => const RecipePage(),
-        )
+        GetPage(name: RecipePage.pageAddress, page: () => const RecipePage()),
       ],
       debugShowCheckedModeBanner: false,
       home: initialPage,

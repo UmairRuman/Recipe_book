@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart';
 import 'package:image/image.dart' as img;
-import 'package:recipe_book/pages/home_page/view/home_page.dart';
+import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
 import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -26,18 +26,23 @@ class LocalNotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   AndroidFlutterLocalNotificationsPlugin?
-      _androidFlutterLocalNotificationsPlugin;
+  _androidFlutterLocalNotificationsPlugin;
 
   Future<void> initializeNotifications() async {
     _androidFlutterLocalNotificationsPlugin =
-        _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+        _flutterLocalNotificationsPlugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings settings =
-        InitializationSettings(android: androidSettings);
-    _flutterLocalNotificationsPlugin.initialize(settings,
-        onDidReceiveNotificationResponse: _ondidRecieveNotificationHandler);
+    const InitializationSettings settings = InitializationSettings(
+      android: androidSettings,
+    );
+    _flutterLocalNotificationsPlugin.initialize(
+      settings,
+      onDidReceiveNotificationResponse: _ondidRecieveNotificationHandler,
+    );
   }
 
   Future<bool> requestNotificationPermission() async {
@@ -50,17 +55,25 @@ class LocalNotificationService {
   }
 
   void setTimerNotification(
-      DateTime dateTime, Meal meal, String message) async {
+    DateTime dateTime,
+    Meal meal,
+    String message,
+  ) async {
     //set the large icon with the meal image
-    final largeIcon =
-        ByteArrayAndroidBitmap(await _getByteArrayFromUrl(meal.strMealThumb));
+    final largeIcon = ByteArrayAndroidBitmap(
+      await _getByteArrayFromUrl(meal.strMealThumb),
+    );
     //set android details
     final AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(_channelId, _channelName,
-            largeIcon: largeIcon);
+        AndroidNotificationDetails(
+          _channelId,
+          _channelName,
+          largeIcon: largeIcon,
+        );
     //set notification details
-    final NotificationDetails notificationDetails =
-        NotificationDetails(android: androidNotificationDetails);
+    final NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+    );
     //schedule Notification
     await _flutterLocalNotificationsPlugin.zonedSchedule(
       _notificationId,
@@ -78,8 +91,10 @@ class LocalNotificationService {
     final Response response = await get(Uri.parse(url));
     if (response.bodyBytes.length > bytesTargetSize) {
       //call the function to resize the image
-      var resizedBytes =
-          await resizeImageBytes(response.bodyBytes, bytesTargetSize);
+      var resizedBytes = await resizeImageBytes(
+        response.bodyBytes,
+        bytesTargetSize,
+      );
       return resizedBytes!;
     } else {
       log('${response.bodyBytes.length}');
@@ -88,7 +103,9 @@ class LocalNotificationService {
   }
 
   Future<Uint8List?> resizeImageBytes(
-      Uint8List imageBytes, int targetSize) async {
+    Uint8List imageBytes,
+    int targetSize,
+  ) async {
     try {
       img.Image? originalImage = img.decodeImage(imageBytes);
       if (originalImage != null) {
@@ -99,7 +116,8 @@ class LocalNotificationService {
         while (true) {
           // Encode the resized image to bytes with the current quality setting
           Uint8List resizedImageBytes = Uint8List.fromList(
-              img.encodeJpg(originalImage, quality: quality));
+            img.encodeJpg(originalImage, quality: quality),
+          );
 
           // Check if the resized image meets the target size
           if (resizedImageBytes.length <= targetSize) {
@@ -130,11 +148,12 @@ class LocalNotificationService {
         await _flutterLocalNotificationsPlugin
             .getNotificationAppLaunchDetails();
     if (appLaunchDetails?.didNotificationLaunchApp ?? false) {
-      Map<String, dynamic> meal =
-          jsonDecode(appLaunchDetails!.notificationResponse!.payload!);
+      Map<String, dynamic> meal = jsonDecode(
+        appLaunchDetails!.notificationResponse!.payload!,
+      );
       return RecipePage(selectedNotificationMeal: Meal.fromMap(meal));
     } else {
-      return const HomePage();
+      return const AuthenticationPage();
     }
   }
 
