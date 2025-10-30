@@ -1,0 +1,2 @@
+D:/recipe book app/Recipe_book/android/app/.cxx/RelWithDebInfo/r12b2rk1/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/recipe book app/Recipe_book/android/app/.cxx/RelWithDebInfo/r12b2rk1/armeabi-v7a/CMakeFiles/rebuild_cache.dir
