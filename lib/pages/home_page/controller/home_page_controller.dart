@@ -20,24 +20,28 @@ class HomePageController extends GetxController {
   dynamic categories;
   var favouriteMealsList = <Meal>[];
   var favouritesFetched = false.obs;
-  var _pageResponse = 0;
+  
 
   loadData() async {
     categories = await CategoriesService().fetchCategories();
     datafetched.value = true;
   }
 
+  int? _pageResponse;
+  
   pushCategoryPage(String categoryName) async {
     favouritesFetched.value = false;
     List<CategoryItem> category =
         await CategoryService().fetchCategory(categoryName);
-    _pageResponse =
-        await Get.toNamed(CategoryPage.pageAddress, arguments: category);
-    if (favouriteMealsList.length != _pageResponse) {
+    final result =
+        await Get.toNamed(CategoryPage.pageAddress, arguments: category) as int?;
+    _pageResponse = result;
+    if (result != null && favouriteMealsList.length != result) {
       favouriteMealsList = DBHelper().favouriteMeals();
     }
     favouritesFetched.value = true;
   }
+// ...existing code...
 
   List<CategoriesModel> getCategoryList() {
     return categories as List<CategoriesModel>;
@@ -76,9 +80,10 @@ class HomePageController extends GetxController {
   onSuggestionTap(String suggestion) async {
     favouritesFetched.value = false;
     var mealResponse = await RecipeService().getMeal(mealName: suggestion);
-    _pageResponse = await Get.toNamed(RecipePage.pageAddress,
-        arguments: mealResponse.meals[0].copiedObject);
-    if (favouriteMealsList.length != _pageResponse) {
+    final result = await Get.toNamed(RecipePage.pageAddress,
+        arguments: mealResponse.meals[0].copiedObject) as int?;
+    _pageResponse = result;
+    if (result != null && favouriteMealsList.length != result) {
       favouriteMealsList = DBHelper().favouriteMeals();
     }
     favouritesFetched.value = true;
@@ -86,8 +91,9 @@ class HomePageController extends GetxController {
 
   onMealTap(Meal meal) async {
     favouritesFetched.value = false;
-    _pageResponse = await Get.toNamed(RecipePage.pageAddress, arguments: meal);
-    if (favouriteMealsList.length != _pageResponse) {
+    final result = await Get.toNamed(RecipePage.pageAddress, arguments: meal) as int?;
+    _pageResponse = result;
+    if (result != null && favouriteMealsList.length != result) {
       favouriteMealsList = DBHelper().favouriteMeals();
     }
     favouritesFetched.value = true;

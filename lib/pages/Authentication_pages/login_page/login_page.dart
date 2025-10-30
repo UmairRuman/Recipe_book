@@ -84,21 +84,22 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+    // if (_formKey.currentState!.validate()) {
+    //   setState(() {
+    //     _isLoading = true;
+    //   });
 
-      // Simulate login process
-      await Future.delayed(const Duration(seconds: 2));
+    //   // Simulate login process
+    //   await Future.delayed(const Duration(seconds: 2));
 
-      setState(() {
-        _isLoading = false;
-      });
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
 
       // Navigate to home
-      Get.offAllNamed('/home');
-    }
+  // }
+      Get.toNamed('/home');
+    
   }
 
   @override

@@ -101,32 +101,33 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
   }
 
   Future<void> _handleSignUp() async {
-    if (_formKey.currentState!.validate() && _agreeToTerms) {
-      setState(() {
-        _isLoading = true;
-      });
+    // if (_formKey.currentState!.validate() && _agreeToTerms) {
+    //   setState(() {
+    //     _isLoading = true;
+    //   });
 
-      // Simulate signup process
-      await Future.delayed(const Duration(seconds: 2));
+    //   // Simulate signup process
+    //   await Future.delayed(const Duration(seconds: 2));
 
-      setState(() {
-        _isLoading = false;
-      });
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
 
-      // Show success message and navigate
-      _showSuccessDialog();
-    } else if (!_agreeToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please agree to Terms & Conditions'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
-    }
+    //   // Show success message and navigate
+    //   _showSuccessDialog();
+    // } else if (!_agreeToTerms) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: const Text('Please agree to Terms & Conditions'),
+    //       backgroundColor: Colors.red,
+    //       behavior: SnackBarBehavior.floating,
+    //       shape: RoundedRectangleBorder(
+    //         borderRadius: BorderRadius.circular(10),
+    //       ),
+    //     ),
+    //   );
+    // }
+    Get.toNamed("/home");
   }
 
   void _showSuccessDialog() {

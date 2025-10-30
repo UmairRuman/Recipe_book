@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
@@ -12,15 +11,15 @@ import 'package:recipe_book/pages/splash_screen/splash_screen.dart';
 import 'package:recipe_book/services/notification_services/local_notification_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 
-import 'firebase_options.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Intialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Intialize Local Notifications
   final LocalNotificationService localNotifications =
+  
+
       LocalNotificationService();
   Widget initialPage = await localNotifications.getInitialPage();
   await localNotifications.initializeNotifications();
@@ -43,6 +42,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       getPages: [
+        GetPage(name: HomePage.pageAddress, page: () => const HomePage()),
         GetPage(
           name: AuthenticationPage.pageAdress,
           page: () => const AuthenticationPage(),

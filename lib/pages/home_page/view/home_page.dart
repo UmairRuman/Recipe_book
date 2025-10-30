@@ -10,7 +10,7 @@ import 'package:recipe_book/pages/home_page/widgets/search_bar/Widget/search_bar
 
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
-  static const pageAddress = '/';
+  static const pageAddress = '/home';
 
   @override
   Widget build(BuildContext context) {

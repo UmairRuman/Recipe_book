@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart';
 import 'package:image/image.dart' as img;
 import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
+import 'package:recipe_book/pages/home_page/view/home_page.dart';
 import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 import 'package:timezone/timezone.dart' as tz;
