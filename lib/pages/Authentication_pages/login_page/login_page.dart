@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_octicons/flutter_octicons.dart';
 import 'package:get/get.dart';
-
-// Main Authentication Page with Page Controller
+import 'package:recipe_book/controllers/auth_controller.dart';
 
 // Amazing Login Page
 class LoginPage extends StatefulWidget {
@@ -26,14 +24,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   late Animation<double> _formAnimation;
   late Animation<double> _logoAnimation;
   late Animation<Offset> _slideAnimation;
-
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  bool _isPasswordVisible = false;
-  bool _isLoading = false;
-  bool _rememberMe = false;
+  final AuthController authController = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -78,28 +69,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   void dispose() {
     _formController.dispose();
     _logoController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _handleLogin() async {
-    // if (_formKey.currentState!.validate()) {
-    //   setState(() {
-    //     _isLoading = true;
-    //   });
-
-    //   // Simulate login process
-    //   await Future.delayed(const Duration(seconds: 2));
-
-    //   setState(() {
-    //     _isLoading = false;
-    //   });
-
-      // Navigate to home
-  // }
-      Get.toNamed('/home');
-    
   }
 
   @override
@@ -182,43 +152,29 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 child: Opacity(
                   opacity: _formAnimation.value,
                   child: Form(
-                    key: _formKey,
+                    key: authController.loginFormKey, // ✅ FIXED: Using controller's form key
                     child: Column(
                       children: [
                         // Email Field
                         _buildAnimatedTextField(
-                          controller: _emailController,
+                          authController: authController,
+                          controller: authController.emailController,
                           hintText: 'Email Address',
                           icon: Icons.email_outlined,
                           keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
-                            }
-                            if (!GetUtils.isEmail(value)) {
-                              return 'Please enter a valid email';
-                            }
-                            return null;
-                          },
+                          validator: authController.validateEmail,
                         ),
 
                         const SizedBox(height: 20),
 
                         // Password Field
                         _buildAnimatedTextField(
-                          controller: _passwordController,
+                          authController: authController,
+                          controller: authController.passwordController,
                           hintText: 'Password',
                           icon: Icons.lock_outline,
                           isPassword: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
-                            }
-                            if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
-                            }
-                            return null;
-                          },
+                          validator: authController.validatePassword,
                         ),
 
                         const SizedBox(height: 20),
@@ -227,37 +183,33 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Transform.scale(
-                                  scale: 0.9,
-                                  child: Checkbox(
-                                    value: _rememberMe,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _rememberMe = value ?? false;
-                                      });
-                                    },
-                                    activeColor: Colors.white,
-                                    checkColor: const Color(0xFF6B73FF),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(4),
+                            Obx(
+                              () => Row(
+                                children: [
+                                  Transform.scale(
+                                    scale: 0.9,
+                                    child: Checkbox(
+                                      value: authController.rememberMe.value,
+                                      onChanged: authController.toggleRememberMe,
+                                      activeColor: Colors.white,
+                                      checkColor: const Color(0xFF6B73FF),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  'Remember me',
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.9),
-                                    fontSize: 14,
+                                  Text(
+                                    'Remember me',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.9),
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             TextButton(
-                              onPressed: () {
-                                // Handle forgot password
-                              },
+                              onPressed: authController.forgotPassword,
                               child: Text(
                                 'Forgot Password?',
                                 style: TextStyle(
@@ -274,9 +226,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
                         // Login Button
                         _buildAnimatedButton(
-                          onPressed: _handleLogin,
                           text: 'Sign In',
-                          isLoading: _isLoading,
                         ),
 
                         const SizedBox(height: 30),
@@ -331,6 +281,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
+    required AuthController authController,
     bool isPassword = false,
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
@@ -341,82 +292,79 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
       ),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: isPassword && !_isPasswordVisible,
-        validator: validator,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(
-            color: Colors.white.withOpacity(0.7),
+      child: Obx(
+        () => TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          obscureText: isPassword ? authController.obscurePassword.value : false, // ✅ FIXED
+          validator: validator,
+          style: const TextStyle(
+            color: Colors.white,
             fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
-          prefixIcon: Icon(
-            icon,
-            color: Colors.white.withOpacity(0.8),
-            size: 24,
-          ),
-          suffixIcon:
-              isPassword
-                  ? IconButton(
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 16,
+            ),
+            prefixIcon: Icon(
+              icon,
+              color: Colors.white.withOpacity(0.8),
+              size: 24,
+            ),
+            suffixIcon: isPassword
+                ? IconButton(
                     icon: Icon(
-                      _isPasswordVisible
+                      authController.obscurePassword.value
                           ? Icons.visibility_off
                           : Icons.visibility,
                       color: Colors.white.withOpacity(0.8),
                       size: 24,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _isPasswordVisible = !_isPasswordVisible;
-                      });
-                    },
+                    onPressed: authController.togglePasswordVisibility,
                   )
-                  : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(20),
+                : null,
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.all(20),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildAnimatedButton({
-    required VoidCallback onPressed,
     required String text,
-    bool isLoading = false,
   }) {
-    return Container(
-      width: double.infinity,
-      height: 56,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.white, Color(0xFFF0F0F0)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: 0,
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+    return Obx(
+      () => Container(
+        width: double.infinity,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Colors.white, Color(0xFFF0F0F0)],
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isLoading ? null : onPressed,
           borderRadius: BorderRadius.circular(16),
-          child: Center(
-            child:
-                isLoading
-                    ? const SizedBox(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 0,
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: authController.isLoading.value
+                ? null
+                : authController.login, // ✅ FIXED: Direct call to login
+            borderRadius: BorderRadius.circular(16),
+            child: Center(
+              child: authController.isLoading.value
+                  ? const SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
@@ -424,7 +372,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         strokeWidth: 3,
                       ),
                     )
-                    : Text(
+                  : Text(
                       text,
                       style: const TextStyle(
                         fontSize: 18,
@@ -433,6 +381,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         letterSpacing: 0.5,
                       ),
                     ),
+            ),
           ),
         ),
       ),
@@ -466,26 +415,42 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildSocialButton(
-              label: "Google",
-              icon: Icons.g_mobiledata,
-              onPressed: () {
-                // Handle Google login
-              },
+            Obx(
+              () => _buildSocialButton(
+                label: "Google",
+                icon: authController.isGoogleLoading.value
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.login, color: Colors.white),
+                onPressed: authController.isGoogleLoading.value
+                    ? null
+                    : authController.signInWithGoogle,
+              ),
             ),
-            _buildSocialButton(
-              label: "Github",
-              icon: OctIcons.git_branch_16,
-              onPressed: () {
-                // Handle Facebook login
-              },
+            Obx(
+              () => _buildSocialButton(
+                label: "Github",
+                icon: authController.isGitHubLoading.value
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.code, color: Colors.white),
+                onPressed: authController.isGitHubLoading.value
+                    ? null
+                    : authController.signInWithGitHub,
+              ),
             ),
-            // _buildSocialButton(
-            //   icon: Icons.apple,
-            //   onPressed: () {
-            //     // Handle Apple login
-            //   },
-            // ),
           ],
         ),
       ],
@@ -493,9 +458,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   Widget _buildSocialButton({
-    required IconData icon,
+    required Widget icon,
     required String label,
-    required VoidCallback onPressed,
+    required Future<void> Function()? onPressed,
   }) {
     return Container(
       width: 90,
@@ -513,7 +478,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: Colors.white, size: 24),
+              icon,
               const SizedBox(height: 4),
               Text(
                 label,
