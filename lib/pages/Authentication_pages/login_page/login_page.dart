@@ -276,60 +276,60 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   Widget _buildAnimatedTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData icon,
-    bool isPassword = false,
-    TextInputType keyboardType = TextInputType.text,
-    String? Function(String?)? validator,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+  required TextEditingController controller,
+  required String hintText,
+  required IconData icon,
+  bool isPassword = false,
+  TextInputType keyboardType = TextInputType.text,
+  String? Function(String?)? validator,
+}) {
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.15),
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+    ),
+    child: TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: isPassword ? authController.obscurePassword.value : false,
+      validator: validator,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
       ),
-      child: Obx(
-        () => TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          obscureText: isPassword ? authController.obscurePassword.value : false,
-          validator: validator,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(
-              color: Colors.white.withOpacity(0.7),
-              fontSize: 16,
-            ),
-            prefixIcon: Icon(
-              icon,
-              color: Colors.white.withOpacity(0.8),
-              size: 24,
-            ),
-            suffixIcon: isPassword
-                ? IconButton(
-                    icon: Icon(
-                      authController.obscurePassword.value
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      color: Colors.white.withOpacity(0.8),
-                      size: 24,
-                    ),
-                    onPressed: authController.togglePasswordVisibility,
-                  )
-                : null,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.all(20),
-          ),
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: TextStyle(
+          color: Colors.white.withOpacity(0.7),
+          fontSize: 16,
         ),
+        prefixIcon: Icon(
+          icon,
+          color: Colors.white.withOpacity(0.8),
+          size: 24,
+        ),
+        suffixIcon: isPassword
+            ? Obx(
+                () => IconButton(
+                  icon: Icon(
+                    authController.obscurePassword.value
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: Colors.white.withOpacity(0.8),
+                    size: 24,
+                  ),
+                  onPressed: authController.togglePasswordVisibility,
+                ),
+              )
+            : null,
+        border: InputBorder.none,
+        contentPadding: const EdgeInsets.all(20),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildAnimatedButton({
     required String text,

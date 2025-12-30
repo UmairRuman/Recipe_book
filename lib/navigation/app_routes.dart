@@ -1,10 +1,9 @@
-
 // lib/navigation/app_routes.dart
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/navigation/auth_middleware.dart';
-import 'package:recipe_book/pages/Authentication_pages/login_page/login_page.dart';
+import 'package:recipe_book/pages/all_categories_page/view/all_categories_page.dart';
 import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
 import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
 import 'package:recipe_book/pages/home_page/view/home_page.dart';
@@ -20,6 +19,7 @@ class AppRoutes {
   static const String splash = '/splash';
   static const String auth = '/auth';
   static const String home = '/home';
+  static const String allCategories = '/all-categories';
   static const String category = '/category';
   static const String recipe = '/recipe';
 
@@ -29,8 +29,6 @@ class AppRoutes {
 
 /// App Pages configuration with middleware
 class AppPages {
-
-  
   // Private constructor to prevent instantiation
   AppPages._();
 
@@ -63,6 +61,18 @@ class AppPages {
           transitionDuration: const Duration(milliseconds: 400),
           middlewares: [
             AuthMiddleware(), // Checks if user is logged in
+          ],
+        ),
+
+        // All Categories Page - Requires authentication
+        // Controller is initialized via DependencyInjection.init()
+        GetPage(
+          name: AppRoutes.allCategories,
+          page: () => const AllCategoriesPage(),
+          transition: Transition.rightToLeft,
+          transitionDuration: const Duration(milliseconds: 300),
+          middlewares: [
+            AuthMiddleware(),
           ],
         ),
 

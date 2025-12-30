@@ -1,10 +1,15 @@
-import 'dart:ui';
+// lib/pages/recipe_page/view/recipe_page.dart
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:recipe_book/controllers/ai_controller.dart';
 import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
+
 import 'package:recipe_book/services/database_services/meal.dart';
+import 'package:recipe_book/services/recipe_service/view/widgets/health_advice_bottom_sheet.dart';
+import 'package:recipe_book/services/recipe_service/view/widgets/nutrition_bottom_sheet.dart';
 
 class RecipePage extends GetView<RecipeController> {
   const RecipePage({super.key, this.selectedNotificationMeal});
@@ -24,6 +29,10 @@ class RecipePage extends GetView<RecipeController> {
       meal = Get.arguments;
     }
     controller.checkForFavouriteIcon(meal);
+    
+    // Get AI Controller
+    final aiController = AIController.instance;
+    
     final Size(:width, :height) = MediaQuery.sizeOf(context);
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
@@ -208,6 +217,11 @@ class RecipePage extends GetView<RecipeController> {
                 children: [
                   const SizedBox(height: 30),
 
+                  // ==================== AI FEATURES SECTION ====================
+                  _buildAIFeaturesSection(context, meal, aiController, isDarkMode),
+
+                  const SizedBox(height: 30),
+
                   // Enhanced ingredients section
                   _buildSectionHeader('Ingredients', Icons.restaurant_menu),
 
@@ -310,6 +324,177 @@ class RecipePage extends GetView<RecipeController> {
     );
   }
 
+  // ==================== AI FEATURES SECTION ====================
+  
+  Widget _buildAIFeaturesSection(
+    BuildContext context,
+    Meal meal,
+    AIController aiController,
+    bool isDarkMode,
+  ) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section title
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Colors.purple, Colors.deepPurple],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.purple.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.psychology, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'AI-Powered Insights',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+
+          // AI feature buttons
+          Row(
+            children: [
+              // Nutrition Facts Button
+              Expanded(
+                child: _buildAIFeatureButton(
+                  context: context,
+                  icon: Icons.restaurant_menu,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4CAF50), Color(0xFF8BC34A)],
+                  ),
+                  label: 'Nutrition\nFacts',
+                  isDarkMode: isDarkMode,
+                  onTap: () => _showNutritionBottomSheet(context, meal, aiController),
+                ),
+              ),
+              
+              const SizedBox(width: 12),
+              
+              // Health Advice Button
+              Expanded(
+                child: _buildAIFeatureButton(
+                  context: context,
+                  icon: Icons.favorite,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFE91E63), Color(0xFFF44336)],
+                  ),
+                  label: 'Health\nAdvice',
+                  isDarkMode: isDarkMode,
+                  onTap: () => _showHealthAdviceBottomSheet(context, meal, aiController),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAIFeatureButton({
+    required BuildContext context,
+    required IconData icon,
+    required Gradient gradient,
+    required String label,
+    required bool isDarkMode,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        onTap();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: gradient.colors.first.withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 24),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Show Nutrition Bottom Sheet
+  void _showNutritionBottomSheet(
+    BuildContext context,
+    Meal meal,
+    AIController aiController,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => NutritionBottomSheet(
+        meal: meal,
+        aiController: aiController,
+      ),
+    );
+  }
+
+  // Show Health Advice Bottom Sheet
+  void _showHealthAdviceBottomSheet(
+    BuildContext context,
+    Meal meal,
+    AIController aiController,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => HealthAdviceBottomSheet(
+        meal: meal,
+        aiController: aiController,
+      ),
+    );
+  }
+
+  // ==================== HELPER WIDGETS ====================
+
   Widget _buildGlassmorphicButton({
     IconData? icon,
     Widget? child,
@@ -384,6 +569,8 @@ class RecipePage extends GetView<RecipeController> {
     );
   }
 }
+
+// ==================== EXISTING WIDGETS ====================
 
 class EnhancedLinkWidget extends GetView<RecipeController> {
   const EnhancedLinkWidget({super.key, required this.source});
@@ -469,104 +656,102 @@ class EnhancedLinkWidget extends GetView<RecipeController> {
 
 class EnhancedIngredientsQuantityList extends StatelessWidget {
   const EnhancedIngredientsQuantityList({
-    super.key,
-    required this.ingredientsAndQuantityList,
-  });
-  final (List<String>, List<String>) ingredientsAndQuantityList;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
-    return Container(
-      constraints: const BoxConstraints(maxHeight: 300),
-      child: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        physics: const BouncingScrollPhysics(),
-        itemCount: ingredientsAndQuantityList.$1.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 8),
-        itemBuilder:
-            (context, index) => TweenAnimationBuilder(
-              duration: Duration(milliseconds: 300 + (index * 100)),
-              tween: Tween<double>(begin: 0, end: 1),
-              builder: (context, double value, child) {
-                return Transform.translate(
-                  offset: Offset(0, 20 * (1 - value)),
-                  child: Opacity(
-                    opacity: value,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
+super.key,
+required this.ingredientsAndQuantityList,
+});
+final (List<String>, List<String>) ingredientsAndQuantityList;
+@override
+Widget build(BuildContext context) {
+final theme = Theme.of(context);
+final isDarkMode = theme.brightness == Brightness.dark;
+return Container(
+  constraints: const BoxConstraints(maxHeight: 300),
+  child: ListView.separated(
+    padding: const EdgeInsets.all(16),
+    physics: const BouncingScrollPhysics(),
+    itemCount: ingredientsAndQuantityList.$1.length,
+    separatorBuilder: (context, index) => const SizedBox(height: 8),
+    itemBuilder:
+        (context, index) => TweenAnimationBuilder(
+          duration: Duration(milliseconds: 300 + (index * 100)),
+          tween: Tween<double>(begin: 0, end: 1),
+          builder: (context, double value, child) {
+            return Transform.translate(
+              offset: Offset(0, 20 * (1 - value)),
+              child: Opacity(
+                opacity: value,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        isDarkMode
+                            ? Colors.white.withOpacity(0.05)
+                            : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.grey.withOpacity(0.1),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
                         color:
                             isDarkMode
-                                ? Colors.white.withOpacity(0.05)
-                                : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.grey.withOpacity(0.1),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                isDarkMode
-                                    ? Colors.black.withOpacity(0.1)
-                                    : Colors.black.withOpacity(0.03),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                                ? Colors.black.withOpacity(0.1)
+                                : Colors.black.withOpacity(0.03),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              ingredientsAndQuantityList.$1[index],
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                color:
-                                    isDarkMode ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              ingredientsAndQuantityList.$2[index],
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: (isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87)
-                                    .withOpacity(0.7),
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    ],
                   ),
-                );
-              },
-            ),
-      ),
-    );
-  }
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          ingredientsAndQuantityList.$1[index],
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color:
+                                isDarkMode ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          ingredientsAndQuantityList.$2[index],
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: (isDarkMode
+                                    ? Colors.white
+                                    : Colors.black87)
+                                .withOpacity(0.7),
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+  ),
+);
+}
 }

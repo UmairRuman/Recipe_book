@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/navigation/app_routes.dart';
 import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
@@ -17,6 +18,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+    // Load the .env file
+  await dotenv.load(fileName: ".env");
 
   // ==================== Initialize Timezones ====================
   tz.initializeTimeZones();

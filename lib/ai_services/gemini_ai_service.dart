@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../../models/ai_models.dart';
@@ -14,13 +15,29 @@ class GeminiAIService extends GetxService {
   late final GenerativeModel _nutritionModel;
   late final GenerativeModel _healthModel;
   
-  // TODO: Move to environment variables or secure storage
-  static const String _apiKey = 'YOUR_GEMINI_API_KEY_HERE';
+
+   // Load API key from environment variables
+  late final String _apiKey;
 
   @override
   void onInit() {
     super.onInit();
+    _loadApiKey();
     _initializeModels();
+  }
+
+  /// Load API key from .env file
+  void _loadApiKey() {
+    _apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
+    
+    if (_apiKey.isEmpty) {
+      log('❌ ERROR: GEMINI_API_KEY not found in .env file!');
+      log('   Please add your API key to the .env file');
+    } else {
+      log('✅ API Key loaded successfully');
+      // Only log first few characters for security
+      log('   Key preview: ${_apiKey.substring(0, 10)}...');
+    }
   }
 
   void _initializeModels() {

@@ -1,5 +1,8 @@
+// lib/pages/home_page/widgets/category_list.dart
+
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
+import 'package:get/get.dart';
+import 'package:recipe_book/navigation/app_routes.dart';
 import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
 import 'package:recipe_book/pages/home_page/model/categories_list_model.dart';
 
@@ -35,16 +38,45 @@ class CategoryReceipeList extends StatelessWidget {
                         letterSpacing: 0.5,
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        // Navigate to all categories
-                      },
-                      child: Text(
-                        'See All',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          Get.toNamed(AppRoutes.allCategories);
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6B73FF).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: const Color(0xFF6B73FF).withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'See All',
+                                style: TextStyle(
+                                  color: Color(0xFF6B73FF),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(width: 4),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                size: 12,
+                                color: Color(0xFF6B73FF),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

@@ -5,7 +5,8 @@ import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart'
 import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
 import 'package:recipe_book/services/database_services/database.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
-import 'package:recipe_book/services/meal_services/recipe_service/recipe_Service.dart';
+import 'package:recipe_book/services/recipe_service/view/recipe_service.dart';
+
 
 class CategoryController extends GetxController {
   final DBHelper _db = DBHelper();
