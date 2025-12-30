@@ -1,0 +1,91 @@
+
+// lib/navigation/app_routes.dart
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:recipe_book/navigation/auth_middleware.dart';
+import 'package:recipe_book/pages/Authentication_pages/login_page/login_page.dart';
+import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
+import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
+import 'package:recipe_book/pages/home_page/view/home_page.dart';
+import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
+import 'package:recipe_book/pages/splash_screen/splash_screen.dart';
+
+/// Route names as constants for type safety
+class AppRoutes {
+  // Private constructor to prevent instantiation
+  AppRoutes._();
+
+  // Route names
+  static const String splash = '/splash';
+  static const String auth = '/auth';
+  static const String home = '/home';
+  static const String category = '/category';
+  static const String recipe = '/recipe';
+
+  // Initial route
+  static const String initial = splash;
+}
+
+/// App Pages configuration with middleware
+class AppPages {
+
+  
+  // Private constructor to prevent instantiation
+  AppPages._();
+
+  /// Get all app routes
+  static List<GetPage> get pages => [
+        // Splash Screen - No middleware (always accessible)
+        GetPage(
+          name: AppRoutes.splash,
+          page: () => const SplashScreen(),
+          transition: Transition.fade,
+          transitionDuration: const Duration(milliseconds: 300),
+        ),
+
+        // Authentication Page - Only accessible when NOT logged in
+        GetPage(
+          name: AppRoutes.auth,
+          page: () => const AuthenticationPage(),
+          transition: Transition.fadeIn,
+          transitionDuration: const Duration(milliseconds: 400),
+          middlewares: [
+            AuthMiddleware(), // Redirects to home if already logged in
+          ],
+        ),
+
+        // Home Page - Requires authentication
+        GetPage(
+          name: AppRoutes.home,
+          page: () => const HomePage(),
+          transition: Transition.fadeIn,
+          transitionDuration: const Duration(milliseconds: 400),
+          middlewares: [
+            AuthMiddleware(), // Checks if user is logged in
+          ],
+        ),
+
+        // Category Page - Requires authentication
+        GetPage(
+          name: AppRoutes.category,
+          page: () => const CategoryPage(),
+          transition: Transition.rightToLeft,
+          transitionDuration: const Duration(milliseconds: 300),
+          middlewares: [
+            AuthMiddleware(),
+          ],
+        ),
+
+        // Recipe Page - Requires authentication
+        GetPage(
+          name: AppRoutes.recipe,
+          page: () => const RecipePage(),
+          transition: Transition.rightToLeft,
+          transitionDuration: const Duration(milliseconds: 300),
+          middlewares: [
+            AuthMiddleware(),
+          ],
+        ),
+      ];
+}

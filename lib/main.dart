@@ -1,12 +1,10 @@
+// lib/main.dart
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
-import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
-import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
+import 'package:recipe_book/navigation/app_routes.dart';
 import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
-import 'package:recipe_book/pages/home_page/view/home_page.dart';
-import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
-import 'package:recipe_book/pages/splash_screen/splash_screen.dart';
 import 'package:recipe_book/services/notification_services/local_notification_service.dart';
 import 'package:recipe_book/utils/dependency_injection.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -20,13 +18,15 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // ==================== Initialize Timezones ====================
+  tz.initializeTimeZones();
+
   // ==================== Initialize Local Notifications ====================
   final LocalNotificationService localNotifications = LocalNotificationService();
   await localNotifications.initializeNotifications();
-  tz.initializeTimeZones();
 
   // ==================== Dependency Injection ====================
-  // Initialize all services and controllers
+  // Initialize all services and controllers (includes AuthService and SecureStorage)
   await DependencyInjection.init();
 
   // Initialize HomePageController separately (needs notification stream)
@@ -36,52 +36,46 @@ void main() async {
     ),
   );
 
-  // ==================== Determine Initial Page ====================
-  // Check if app was opened from notification
-  Widget initialPage = await localNotifications.getInitialPage();
+  // ==================== Determine Initial Route ====================
+  // Check if user is logged in and if app was opened from notification
+  final String initialRoute = await localNotifications.getInitialRoute();
 
-  runApp(MyApp(initialPage: initialPage));
+  debugPrint('🚀 App starting with initial route: $initialRoute');
+
+  runApp(MyApp(initialRoute: initialRoute));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.initialPage});
-  final Widget initialPage;
+  const MyApp({super.key, required this.initialRoute});
+  
+  final String initialRoute;
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Recipe Book',
       debugShowCheckedModeBanner: false,
+      
+      // ==================== Theme ====================
       theme: ThemeData(
         primarySwatch: Colors.orange,
         useMaterial3: true,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          centerTitle: true,
+          backgroundColor: Colors.orange,
+          foregroundColor: Colors.white,
+        ),
       ),
+      
       // ==================== Routes ====================
-      initialRoute: '/splash', // Start with splash screen
-      getPages: [
-        GetPage(
-          name: '/splash',
-          page: () => const SplashScreen(),
-        ),
-        GetPage(
-          name: '/auth',
-          page: () => const AuthenticationPage(),
-        ),
-        GetPage(
-          name: '/home',
-          page: () => const HomePage(),
-        ),
-        GetPage(
-          name: '/category',
-          page: () => const CategoryPage(),
-        ),
-        GetPage(
-          name: '/recipe',
-          page: () => const RecipePage(),
-        ),
-      ],
-      // Use initialPage if opened from notification, otherwise use initialRoute
-      home: initialPage,
+      initialRoute: initialRoute, // Dynamic initial route based on auth state
+      getPages: AppPages.pages,   // All routes with middleware
+      
+      // ==================== Default Transition ====================
+      defaultTransition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
     );
   }
 }

@@ -3,7 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:recipe_book/model/user_model.dart';
+import 'package:recipe_book/models/user_model.dart';
 import 'package:recipe_book/services/auth_services/secure_storage_service.dart';
 import 'auth_exceptions.dart';
 

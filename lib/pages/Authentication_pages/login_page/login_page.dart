@@ -152,12 +152,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 child: Opacity(
                   opacity: _formAnimation.value,
                   child: Form(
-                    key: authController.loginFormKey, // ✅ FIXED: Using controller's form key
+                    key: authController.loginFormKey,
                     child: Column(
                       children: [
-                        // Email Field
+                        // Email Field - NO Obx needed (no reactive variables)
                         _buildAnimatedTextField(
-                          authController: authController,
                           controller: authController.emailController,
                           hintText: 'Email Address',
                           icon: Icons.email_outlined,
@@ -167,9 +166,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
                         const SizedBox(height: 20),
 
-                        // Password Field
+                        // Password Field - Obx needed for obscurePassword
                         _buildAnimatedTextField(
-                          authController: authController,
                           controller: authController.passwordController,
                           hintText: 'Password',
                           icon: Icons.lock_outline,
@@ -179,7 +177,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
                         const SizedBox(height: 20),
 
-                        // Remember Me & Forgot Password
+                        // Remember Me & Forgot Password - Obx needed for rememberMe
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -224,14 +222,14 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
                         const SizedBox(height: 30),
 
-                        // Login Button
+                        // Login Button - Obx needed for isLoading
                         _buildAnimatedButton(
                           text: 'Sign In',
                         ),
 
                         const SizedBox(height: 30),
 
-                        // Social Login
+                        // Social Login - Obx needed for loading states
                         _buildSocialLoginSection(),
 
                         const SizedBox(height: 30),
@@ -281,7 +279,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
-    required AuthController authController,
     bool isPassword = false,
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
@@ -296,7 +293,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         () => TextFormField(
           controller: controller,
           keyboardType: keyboardType,
-          obscureText: isPassword ? authController.obscurePassword.value : false, // ✅ FIXED
+          obscureText: isPassword ? authController.obscurePassword.value : false,
           validator: validator,
           style: const TextStyle(
             color: Colors.white,
@@ -360,7 +357,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           child: InkWell(
             onTap: authController.isLoading.value
                 ? null
-                : authController.login, // ✅ FIXED: Direct call to login
+                : authController.login,
             borderRadius: BorderRadius.circular(16),
             child: Center(
               child: authController.isLoading.value

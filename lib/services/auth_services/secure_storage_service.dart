@@ -3,7 +3,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:recipe_book/model/user_model.dart';
+import 'package:recipe_book/models/user_model.dart';
 
 
 /// Service for securely storing and retrieving user credentials and data

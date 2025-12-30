@@ -176,10 +176,10 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
                 child: Opacity(
                   opacity: _formAnimation.value,
                   child: Form(
-                    key: authController.signupFormKey, // ✅ FIXED: Using controller's form key
+                    key: authController.signupFormKey,
                     child: Column(
                       children: [
-                        // Full Name Field
+                        // Full Name Field - NO Obx needed (no reactive variables)
                         _buildAnimatedTextField(
                           controller: authController.fullNameController,
                           validator: authController.validateFullName,
@@ -190,7 +190,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
 
                         const SizedBox(height: 16),
 
-                        // Email Field
+                        // Email Field - NO Obx needed (no reactive variables)
                         _buildAnimatedTextField(
                           controller: authController.emailController,
                           validator: authController.validateEmail,
@@ -201,7 +201,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
 
                         const SizedBox(height: 16),
 
-                        // Password Field
+                        // Password Field - Obx needed for obscurePassword
                         _buildAnimatedTextField(
                           controller: authController.passwordController,
                           validator: authController.validatePassword,
@@ -213,7 +213,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
 
                         const SizedBox(height: 16),
 
-                        // Confirm Password Field
+                        // Confirm Password Field - Obx needed for obscureConfirmPassword
                         _buildAnimatedTextField(
                           controller: authController.confirmPasswordController,
                           validator: authController.validateConfirmPassword,
@@ -225,7 +225,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
 
                         const SizedBox(height: 20),
 
-                        // Terms & Conditions
+                        // Terms & Conditions - Obx needed for acceptTerms
                         Obx(
                           () => Row(
                             children: [
@@ -289,7 +289,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
 
                         const SizedBox(height: 30),
 
-                        // SignUp Button
+                        // SignUp Button - Obx needed for isLoading
                         _buildAnimatedButton(
                           text: 'Create Account',
                         ),
@@ -386,7 +386,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
               ? (isConfirmPassword
                   ? authController.obscureConfirmPassword.value
                   : authController.obscurePassword.value)
-              : false, // ✅ FIXED: Proper logic
+              : false,
           validator: validator,
           style: const TextStyle(
             color: Colors.white,
@@ -456,7 +456,7 @@ class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
           child: InkWell(
             onTap: authController.isLoading.value
                 ? null
-                : authController.signUp, // ✅ FIXED: Direct call
+                : authController.signUp,
             borderRadius: BorderRadius.circular(16),
             child: Center(
               child: authController.isLoading.value

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:recipe_book/model/user_model.dart';
+import 'package:recipe_book/models/user_model.dart';
 import 'package:recipe_book/services/auth_services/auth_exceptions.dart';
 import 'package:recipe_book/services/auth_services/auth_service.dart';
 import 'package:recipe_book/services/auth_services/secure_storage_service.dart';

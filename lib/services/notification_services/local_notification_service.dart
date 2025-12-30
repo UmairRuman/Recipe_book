@@ -1,15 +1,19 @@
+// lib/services/notification_services/local_notification_service.dart
+
 import 'dart:async';
-import 'dart:convert';
+
 import 'dart:developer';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:http/http.dart';
+import 'package:get/get.dart';
+
+import 'package:http/http.dart' as http;
+
+
 import 'package:image/image.dart' as img;
-import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
-import 'package:recipe_book/pages/home_page/view/home_page.dart';
-import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
+import 'package:recipe_book/navigation/app_routes.dart';
+import 'package:recipe_book/services/auth_services/secure_storage_service.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -27,14 +31,13 @@ class LocalNotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   AndroidFlutterLocalNotificationsPlugin?
-  _androidFlutterLocalNotificationsPlugin;
+      _androidFlutterLocalNotificationsPlugin;
 
   Future<void> initializeNotifications() async {
     _androidFlutterLocalNotificationsPlugin =
         _flutterLocalNotificationsPlugin
             .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >();
+                AndroidFlutterLocalNotificationsPlugin>();
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings settings = InitializationSettings(
@@ -67,10 +70,10 @@ class LocalNotificationService {
     //set android details
     final AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          largeIcon: largeIcon,
-        );
+      _channelId,
+      _channelName,
+      largeIcon: largeIcon,
+    );
     //set notification details
     final NotificationDetails notificationDetails = NotificationDetails(
       android: androidNotificationDetails,
@@ -89,7 +92,7 @@ class LocalNotificationService {
 
   Future<Uint8List> _getByteArrayFromUrl(String url) async {
     const bytesTargetSize = 70000;
-    final Response response = await get(Uri.parse(url));
+    final http.Response response = await http.get(Uri.parse(url));
     if (response.bodyBytes.length > bytesTargetSize) {
       //call the function to resize the image
       var resizedBytes = await resizeImageBytes(
@@ -144,17 +147,54 @@ class LocalNotificationService {
     return null;
   }
 
-  Future<Widget> getInitialPage() async {
-    final NotificationAppLaunchDetails? appLaunchDetails =
-        await _flutterLocalNotificationsPlugin
-            .getNotificationAppLaunchDetails();
-    if (appLaunchDetails?.didNotificationLaunchApp ?? false) {
-      Map<String, dynamic> meal = jsonDecode(
-        appLaunchDetails!.notificationResponse!.payload!,
-      );
-      return RecipePage(selectedNotificationMeal: Meal.fromMap(meal));
-    } else {
-      return const AuthenticationPage();
+  /// Determine initial route based on notification and auth state
+  /// Returns the route name instead of Widget for better separation of concerns
+  Future<String> getInitialRoute() async {
+    try {
+      // Check if app was launched from notification
+      final NotificationAppLaunchDetails? appLaunchDetails =
+          await _flutterLocalNotificationsPlugin
+              .getNotificationAppLaunchDetails();
+
+      if (appLaunchDetails?.didNotificationLaunchApp ?? false) {
+        // App was opened from notification
+        final payload = appLaunchDetails!.notificationResponse!.payload;
+        if (payload != null) {
+          log('📱 App opened from notification with payload');
+          // Store payload for later use in RecipePage
+          selectedNotificationStream.add(payload);
+          
+          // Check if user is logged in
+          final storageService = Get.find<SecureStorageService>();
+          final isLoggedIn = await storageService.isLoggedIn();
+          
+          if (isLoggedIn) {
+            // Navigate to recipe page if logged in
+            return AppRoutes.recipe;
+          } else {
+            // Navigate to auth if not logged in
+            return AppRoutes.auth;
+          }
+        }
+      }
+
+      // Normal app launch - check auth state
+      final storageService = Get.find<SecureStorageService>();
+      final isLoggedIn = await storageService.isLoggedIn();
+
+      log('🔐 User login status: $isLoggedIn');
+
+      if (isLoggedIn) {
+        // User is logged in, go to home
+        return AppRoutes.home;
+      } else {
+        // User is not logged in, go to auth
+        return AppRoutes.auth;
+      }
+    } catch (e) {
+      log('⚠️ Error determining initial route: $e');
+      // Default to auth on error
+      return AppRoutes.auth;
     }
   }
 

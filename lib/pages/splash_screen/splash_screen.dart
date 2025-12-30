@@ -2,7 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:recipe_book/navigation/app_routes.dart';
+import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
 import 'package:recipe_book/pages/home_page/view/home_page.dart';
+import 'package:recipe_book/services/auth_services/secure_storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
   static const pageAdress = "/splash";
@@ -150,7 +153,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Navigate to home after animations
     await Future.delayed(const Duration(seconds: 4));
-    _navigateToHome();
+    _navigateToNextScreen();
   }
 
   void _cycleLoadingMessages() async {
@@ -167,9 +170,28 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  void _navigateToHome() async {
-    // Replace with your actual home route
-    await Get.to(const HomePage()); // or your home page route
+   Future<void> _navigateToNextScreen() async {
+     // Wait for splash animation
+    await Future.delayed(const Duration(seconds: 3));
+
+    try {
+      // Check if user is logged in
+      final storageService = Get.find<SecureStorageService>();
+      final isLoggedIn = await storageService.isLoggedIn();
+
+      debugPrint('🔐 Splash: User logged in = $isLoggedIn');
+
+      // Navigate based on login status
+      if (isLoggedIn) {
+        Get.offAllNamed(AppRoutes.home);
+      } else {
+        Get.offAllNamed(AppRoutes.auth);
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error checking login status: $e');
+      // Default to auth on error
+      Get.offAllNamed(AppRoutes.auth);
+    }
   }
 
   @override
