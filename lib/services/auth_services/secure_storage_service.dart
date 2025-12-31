@@ -3,8 +3,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:recipe_book/models/user_model.dart';
-
+import '../../models/user_model.dart';
 
 /// Service for securely storing and retrieving user credentials and data
 /// Uses flutter_secure_storage for encrypted storage on device
@@ -25,11 +24,54 @@ class SecureStorageService extends GetxService {
     super.onInit();
     _secureStorage = const FlutterSecureStorage(
       aOptions: AndroidOptions(
+        encryptedSharedPreferences: true,
       ),
       iOptions: IOSOptions(
         accessibility: KeychainAccessibility.first_unlock,
       ),
     );
+  }
+
+  // ==================== Generic Read/Write/Delete Methods ====================
+
+  /// Read a value from secure storage
+  Future<String?> read({required String key}) async {
+    try {
+      return await _secureStorage.read(key: key);
+    } catch (e) {
+      print('Error reading from secure storage: $e');
+      return null;
+    }
+  }
+
+  /// Write a value to secure storage
+  Future<void> write({required String key, required String value}) async {
+    try {
+      await _secureStorage.write(key: key, value: value);
+    } catch (e) {
+      print('Error writing to secure storage: $e');
+      throw Exception('Failed to write to secure storage: $e');
+    }
+  }
+
+  /// Delete a value from secure storage
+  Future<void> delete({required String key}) async {
+    try {
+      await _secureStorage.delete(key: key);
+    } catch (e) {
+      print('Error deleting from secure storage: $e');
+      throw Exception('Failed to delete from secure storage: $e');
+    }
+  }
+
+  /// Check if a key exists
+  Future<bool> containsKey({required String key}) async {
+    try {
+      final value = await _secureStorage.read(key: key);
+      return value != null;
+    } catch (e) {
+      return false;
+    }
   }
 
   // ==================== User Data Operations ====================

@@ -7,6 +7,8 @@ import 'package:recipe_book/pages/all_categories_page/view/all_categories_page.d
 import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
 import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
 import 'package:recipe_book/pages/home_page/view/home_page.dart';
+import 'package:recipe_book/pages/profile_page/edit_profile_page.dart';
+import 'package:recipe_book/pages/profile_page/view/profile_page.dart';
 import 'package:recipe_book/pages/recipe_page/view/recipe_page.dart';
 import 'package:recipe_book/pages/splash_screen/splash_screen.dart';
 
@@ -22,6 +24,8 @@ class AppRoutes {
   static const String allCategories = '/all-categories';
   static const String category = '/category';
   static const String recipe = '/recipe';
+   static const String profile = '/profile';
+  static const String editProfile = '/edit-profile';
 
   // Initial route
   static const String initial = splash;
@@ -97,5 +101,20 @@ class AppPages {
             AuthMiddleware(),
           ],
         ),
+
+       // Profile Page - Requires authentication  
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfilePage(),
+      transition: Transition.rightToLeft,
+      middlewares: [AuthMiddleware()],
+    ),
+    // Profile Edit Page - Requires authentication
+    GetPage(
+      name: AppRoutes.editProfile,
+      page: () => const EditProfilePage(),
+      transition: Transition.rightToLeft,
+      middlewares: [AuthMiddleware()],
+    ),
       ];
 }
