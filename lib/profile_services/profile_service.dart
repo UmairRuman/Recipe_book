@@ -12,7 +12,7 @@ import '../../models/user_profile_model.dart';
 
 /// Service for managing user profiles
 /// Stores profiles in secure local storage
-/// TODO: Sync with Firestore for cloud backup
+
 class ProfileService extends GetxService {
   static ProfileService get instance => Get.find<ProfileService>();
 

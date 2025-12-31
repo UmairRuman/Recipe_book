@@ -4,14 +4,19 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/ai_services/gemini_ai_service.dart';
-import '../models/ai_models.dart';
 
+import '../models/ai_models.dart';
+import 'profile_controller.dart';
 
 /// AI Controller for managing nutrition and health recommendation states
+/// Now integrates with ProfileController for personalized recommendations
 class AIController extends GetxController {
   static AIController get instance => Get.find<AIController>();
 
   final GeminiAIService _aiService = GeminiAIService.instance;
+  
+  // Get ProfileController for user health data
+  ProfileController get _profileController => Get.find<ProfileController>();
 
   // ==================== Observables ====================
 
@@ -25,11 +30,6 @@ class AIController extends GetxController {
   final RxBool isLoadingHealth = false.obs;
   final RxString healthError = ''.obs;
 
-  // User Health Profile (for personalization)
-  final RxString userHealthCondition = 'General Health'.obs;
-  final RxList<String> dietaryRestrictions = <String>[].obs;
-  final RxList<String> allergies = <String>[].obs;
-
   // Cache tracking
   final RxMap<String, NutritionData> nutritionCache = <String, NutritionData>{}.obs;
   final RxMap<String, HealthRecommendation> healthCache = <String, HealthRecommendation>{}.obs;
@@ -38,7 +38,49 @@ class AIController extends GetxController {
   void onInit() {
     super.onInit();
     _checkAPIConfiguration();
-    log('✅ AIController initialized');
+    _listenToProfileChanges();
+    log('✅ AIController initialized with profile integration');
+  }
+
+  // ==================== Profile Integration ====================
+
+  /// Listen to profile changes and clear health cache
+  void _listenToProfileChanges() {
+    ever(_profileController.userProfile, (profile) {
+      if (profile != null) {
+        log('👤 Profile updated, clearing health cache for fresh recommendations');
+        _clearHealthCache();
+      }
+    });
+  }
+
+  /// Get user's health conditions as string
+  String? get _userHealthConditions {
+    final profile = _profileController.userProfile.value;
+    if (profile == null || profile.healthConditions.isEmpty) return null;
+    
+    return profile.healthConditions
+        .map((condition) => '${condition.name} (${condition.severity})')
+        .join(', ');
+  }
+
+  /// Get user's dietary restrictions
+  List<String>? get _userDietaryRestrictions {
+    final profile = _profileController.userProfile.value;
+    if (profile == null || profile.dietaryRestrictions.isEmpty) return null;
+    return profile.dietaryRestrictions;
+  }
+
+  /// Get user's allergies
+  List<String>? get _userAllergies {
+    final profile = _profileController.userProfile.value;
+    if (profile == null || profile.allergies.isEmpty) return null;
+    return profile.allergies;
+  }
+
+  /// Check if user profile is complete enough for personalized AI
+  bool get isProfileReadyForAI {
+    return _profileController.isProfileCompleteForAI;
   }
 
   // ==================== Nutrition Analysis ====================
@@ -81,6 +123,9 @@ class AIController extends GetxController {
         log('✅ Nutrition data received');
         log('   Calories: ${result.caloriesPerServing}');
         log('   Health Score: ${result.healthScore}');
+        
+        // Check for allergens if user has profile
+        _checkForAllergens(recipeName, result.allergens);
       } else {
         // Failed to get data
         nutritionError.value = 'Failed to analyze nutrition. Please try again.';
@@ -96,7 +141,7 @@ class AIController extends GetxController {
 
   // ==================== Health Recommendations ====================
 
-  /// Get health recommendations for a recipe
+  /// Get health recommendations for a recipe with user profile integration
   Future<void> getHealthRecommendations({
     required String recipeId,
     required String recipeName,
@@ -104,6 +149,13 @@ class AIController extends GetxController {
     bool forceRefresh = false,
   }) async {
     try {
+      // Check if profile is complete enough
+      if (!isProfileReadyForAI) {
+        healthError.value = 'Complete your profile (50%+) for personalized recommendations';
+        _showProfileIncompleteMessage();
+        return;
+      }
+
       // Check cache first unless force refresh
       if (!forceRefresh && healthCache.containsKey(recipeId)) {
         log('📦 Using cached health advice for: $recipeName');
@@ -116,15 +168,18 @@ class AIController extends GetxController {
       healthError.value = '';
       currentHealthAdvice.value = null;
 
-      log('🤖 Fetching health recommendations for: $recipeName');
+      log('🤖 Fetching personalized health recommendations for: $recipeName');
+      log('👤 User conditions: ${_userHealthConditions ?? "None"}');
+      log('🥗 User restrictions: ${_userDietaryRestrictions?.join(", ") ?? "None"}');
+      log('⚠️ User allergies: ${_userAllergies?.join(", ") ?? "None"}');
 
-      // Call AI service with user profile
+      // Call AI service with user profile data
       final result = await _aiService.getHealthRecommendations(
         recipeName: recipeName,
         nutritionData: nutritionData,
-        userHealthCondition: userHealthCondition.value,
-        dietaryRestrictions: dietaryRestrictions.isEmpty ? null : dietaryRestrictions,
-        allergies: allergies.isEmpty ? null : allergies,
+        userHealthCondition: _userHealthConditions,
+        dietaryRestrictions: _userDietaryRestrictions,
+        allergies: _userAllergies,
       );
 
       if (result != null) {
@@ -135,6 +190,11 @@ class AIController extends GetxController {
         log('✅ Health recommendations received');
         log('   Rating: ${result.overallRating}');
         log('   Suitable: ${result.recommendations.suitable}');
+        
+        // Show warning if recipe is not suitable
+        if (!result.recommendations.suitable) {
+          _showUnsuitableRecipeWarning(recipeName);
+        }
       } else {
         // Failed to get data
         healthError.value = 'Failed to get health advice. Please try again.';
@@ -148,45 +208,93 @@ class AIController extends GetxController {
     }
   }
 
-  // ==================== User Profile Management ====================
-
-  /// Update user health condition
-  void updateHealthCondition(String condition) {
-    userHealthCondition.value = condition;
-    _clearHealthCache(); // Clear cache to get updated recommendations
-    log('👤 Health condition updated: $condition');
+  /// Quick check if recipe is safe for user (based on allergies)
+  bool isRecipeSafeForUser(List<String> recipeAllergens) {
+    final userAllergies = _userAllergies;
+    if (userAllergies == null || userAllergies.isEmpty) return true;
+    
+    // Check if any recipe allergen matches user allergies
+    for (var allergen in recipeAllergens) {
+      for (var userAllergen in userAllergies) {
+        if (allergen.toLowerCase().contains(userAllergen.toLowerCase()) ||
+            userAllergen.toLowerCase().contains(allergen.toLowerCase())) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
-  /// Add dietary restriction
-  void addDietaryRestriction(String restriction) {
-    if (!dietaryRestrictions.contains(restriction)) {
-      dietaryRestrictions.add(restriction);
-      _clearHealthCache();
-      log('🥗 Dietary restriction added: $restriction');
+  // ==================== Allergy Checking ====================
+
+  /// Check recipe allergens against user profile
+  void _checkForAllergens(String recipeName, List<String> recipeAllergens) {
+    final userAllergies = _userAllergies;
+    if (userAllergies == null || userAllergies.isEmpty) return;
+    
+    final foundAllergens = <String>[];
+    
+    for (var allergen in recipeAllergens) {
+      for (var userAllergen in userAllergies) {
+        if (allergen.toLowerCase().contains(userAllergen.toLowerCase()) ||
+            userAllergen.toLowerCase().contains(allergen.toLowerCase())) {
+          foundAllergens.add(allergen);
+        }
+      }
+    }
+    
+    if (foundAllergens.isNotEmpty) {
+      Get.snackbar(
+        '⚠️ Allergy Warning',
+        '$recipeName contains: ${foundAllergens.join(", ")}',
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 5),
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(10),
+        borderRadius: 10,
+        icon: const Icon(Icons.warning_amber, color: Colors.white),
+      );
     }
   }
 
-  /// Remove dietary restriction
-  void removeDietaryRestriction(String restriction) {
-    dietaryRestrictions.remove(restriction);
-    _clearHealthCache();
-    log('🥗 Dietary restriction removed: $restriction');
+  // ==================== User Feedback ====================
+
+  /// Show message when profile is incomplete
+  void _showProfileIncompleteMessage() {
+    Get.snackbar(
+      '📝 Complete Your Profile',
+      'Add health information for personalized AI recommendations',
+      backgroundColor: Colors.orange.shade400,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 4),
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.all(10),
+      borderRadius: 10,
+      mainButton: TextButton(
+        onPressed: () {
+          Get.toNamed('/profile');
+        },
+        child: const Text(
+          'Complete Profile',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
   }
 
-  /// Add allergy
-  void addAllergy(String allergy) {
-    if (!allergies.contains(allergy)) {
-      allergies.add(allergy);
-      _clearHealthCache();
-      log('⚠️ Allergy added: $allergy');
-    }
-  }
-
-  /// Remove allergy
-  void removeAllergy(String allergy) {
-    allergies.remove(allergy);
-    _clearHealthCache();
-    log('⚠️ Allergy removed: $allergy');
+  /// Show warning when recipe is not suitable
+  void _showUnsuitableRecipeWarning(String recipeName) {
+    Get.snackbar(
+      '⚠️ Health Advisory',
+      'This recipe may not be suitable for your health conditions. Check recommendations.',
+      backgroundColor: Colors.orange.shade600,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 5),
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(10),
+      borderRadius: 10,
+    );
   }
 
   // ==================== Cache Management ====================
@@ -195,7 +303,7 @@ class AIController extends GetxController {
   void _clearHealthCache() {
     healthCache.clear();
     currentHealthAdvice.value = null;
-    log('🗑️ Health cache cleared');
+    log('🗑️ Health cache cleared due to profile update');
   }
 
   /// Clear all caches
@@ -224,7 +332,7 @@ class AIController extends GetxController {
   void _checkAPIConfiguration() {
     if (!_aiService.isConfigured()) {
       log('⚠️ WARNING: Gemini API key not configured!');
-      log('   Please add your API key in gemini_ai_service.dart');
+      log('   Please add your API key to .env file');
     } else {
       log('✅ Gemini API configured');
     }
@@ -235,8 +343,20 @@ class AIController extends GetxController {
     final result = await _aiService.testConnection();
     if (result) {
       log('✅ API connection successful');
+      Get.snackbar(
+        '✅ Connected',
+        'AI service is ready',
+        backgroundColor: Colors.green.shade400,
+        colorText: Colors.white,
+      );
     } else {
       log('❌ API connection failed');
+      Get.snackbar(
+        '❌ Connection Failed',
+        'Please check your API key',
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+      );
     }
     return result;
   }
@@ -260,6 +380,12 @@ class AIController extends GetxController {
   bool hasHealthAdvice(String recipeId) {
     return healthCache.containsKey(recipeId);
   }
+
+  /// Get profile completion percentage
+  int get profileCompletion => _profileController.profileCompletion.value;
+
+  /// Get health summary for display
+  String get userHealthSummary => _profileController.healthSummary;
 
   @override
   void onClose() {

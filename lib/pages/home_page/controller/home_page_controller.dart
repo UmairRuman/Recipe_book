@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:get/get.dart';
+import 'package:recipe_book/navigation/app_routes.dart';
 import 'package:recipe_book/pages/category_page/model/category_model.dart';
 import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
 import 'package:recipe_book/pages/home_page/model/categories_list_model.dart';
@@ -29,18 +30,11 @@ class HomePageController extends GetxController {
 
   int? _pageResponse;
   
-  pushCategoryPage(String categoryName) async {
-    favouritesFetched.value = false;
-    List<CategoryItem> category =
-        await CategoryService().fetchCategory(categoryName);
-    final result =
-        await Get.toNamed(CategoryPage.pageAddress, arguments: category) as int?;
-    _pageResponse = result;
-    if (result != null && favouriteMealsList.length != result) {
-      favouriteMealsList = DBHelper().favouriteMeals();
-    }
-    favouritesFetched.value = true;
+ void pushCategoryPage(String categoryName) {
+    // Pass only the category name as a String
+    Get.toNamed(AppRoutes.category, arguments: categoryName);
   }
+
 // ...existing code...
 
   List<CategoriesModel> getCategoryList() {

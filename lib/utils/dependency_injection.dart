@@ -8,7 +8,6 @@ import 'package:recipe_book/pages/all_categories_page/controller/all_categories_
 import 'package:recipe_book/pages/category_page/controller/category_controller.dart';
 import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
 import 'package:recipe_book/profile_services/profile_service.dart';
-import 'package:recipe_book/services/notification_services/local_notification_service.dart';
 import '../services/auth_services/auth_service.dart';
 import '../services/auth_services/secure_storage_service.dart';
 import '../controllers/auth_controller.dart';
@@ -37,7 +36,16 @@ class DependencyInjection {
       permanent: true,
     );
 
-    // Initialize Gemini AI Service
+    // Initialize Profile Service (before ProfileController)
+    await Get.putAsync(
+      () async {
+        final service = ProfileService();
+        return service;
+      },
+      permanent: true,
+    );
+
+    // Initialize Gemini AI Service (before AIController)
     Get.put(GeminiAIService(), permanent: true);
 
     // ==================== Initialize Controllers ====================
@@ -45,6 +53,13 @@ class DependencyInjection {
     
     // Auth Controller - fenix:true means it will be recreated if disposed
     Get.lazyPut(() => AuthController(), fenix: true);
+
+    // Profile Controller - MUST be initialized before AIController
+    // AIController depends on ProfileController
+    Get.put(ProfileController(), permanent: true);
+
+    // AI Controller - depends on ProfileController (put after ProfileController)
+    Get.put(AIController(), permanent: true);
 
     // Category Controller - used in CategoryPage
     Get.lazyPut(() => CategoryController(), fenix: true);
@@ -55,24 +70,10 @@ class DependencyInjection {
     // All Categories Controller - used in AllCategoriesPage
     Get.lazyPut(() => AllCategoriesController(), fenix: true);
     
-    // Initialize AI Controller
-    Get.put(AIController(), permanent: true);
-
-     // Profile Service
-    await Get.putAsync(
-      () async {
-        final service = ProfileService();
-        return service;
-      },
-      permanent: true,
-    );
-
-    // ... existing controllers ...
-
-    // Profile Controller
-    Get.lazyPut(() => ProfileController(), fenix: true);
-    
     // Note: HomePageController is initialized separately in main.dart
     // because it requires LocalNotificationService's selectedNotificationStream
+
+      // All Favourites Controller - used in AllFavouritesPage
+    // Get.lazyPut(() => AllFavouritesController(), fenix: true);
   }
 }

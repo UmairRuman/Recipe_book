@@ -7,7 +7,7 @@ import 'package:recipe_book/navigation/app_routes.dart';
 import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
 import 'package:recipe_book/pages/home_page/widgets/cache_receipes.dart';
 import 'package:recipe_book/pages/home_page/widgets/category_list.dart';
-import 'package:recipe_book/pages/home_page/widgets/fav_list.dart';
+import 'package:recipe_book/pages/all_favourites_page/fav_list.dart';
 import 'package:recipe_book/pages/home_page/widgets/search_bar/Widget/search_bar_widget.dart';
 
 class HomePage extends GetView<HomePageController> {
@@ -407,9 +407,9 @@ class HomePage extends GetView<HomePageController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Complete Your Profile',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
