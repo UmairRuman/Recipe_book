@@ -164,11 +164,11 @@ class AllCategoriesPage extends GetView<AllCategoriesController> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  _buildFilterChip('All', true),
+                  _buildFilterChip('All (A-Z)', true),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Popular', false),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('A-Z', false),
+                  // _buildFilterChip('Popular', false),
+                  // const SizedBox(width: 8),
+                  // _buildFilterChip('A-Z', false),
                 ],
               ),
             ),

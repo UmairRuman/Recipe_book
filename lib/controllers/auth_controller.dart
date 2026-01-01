@@ -1,5 +1,7 @@
 // lib/controllers/auth_controller.dart
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/models/user_model.dart';
@@ -216,7 +218,7 @@ class AuthController extends GetxController {
     } on AuthException catch (e) {
       _showSnackBar('Google Sign-In Failed', e.message, isError: true);
     } catch (e) {
-      _showSnackBar('Error', 'An unexpected error occurred', isError: true);
+      _showSnackBar('Error', 'An unexpected error occurred' , isError: true);
     } finally {
       isGoogleLoading.value = false;
     }
@@ -224,6 +226,7 @@ class AuthController extends GetxController {
 
   /// Handle GitHub sign in
   Future<void> signInWithGitHub() async {
+    log("Starting GitHub Sign-In");
     try {
       isGitHubLoading.value = true;
 
@@ -241,6 +244,7 @@ class AuthController extends GetxController {
     } on AuthException catch (e) {
       _showSnackBar('GitHub Sign-In Failed', e.message, isError: true);
     } catch (e) {
+      log("GitHub Sign-In Error: ${e.toString()}");
       _showSnackBar('Error', 'An unexpected error occurred', isError: true);
     } finally {
       isGitHubLoading.value = false;

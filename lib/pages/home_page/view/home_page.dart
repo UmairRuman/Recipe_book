@@ -264,31 +264,31 @@ class HomePage extends GetView<HomePageController> {
       ),
       actions: [
         // Notifications
-        IconButton(
-          icon: Stack(
-            children: [
-              const Icon(Icons.notifications_outlined, color: Colors.white),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 12,
-                    minHeight: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          onPressed: () {
-            // TODO: Navigate to notifications
-          },
-        ),
+        // IconButton(
+        //   icon: Stack(
+        //     children: [
+        //       const Icon(Icons.notifications_outlined, color: Colors.white),
+        //       Positioned(
+        //         right: 0,
+        //         top: 0,
+        //         child: Container(
+        //           padding: const EdgeInsets.all(2),
+        //           decoration: BoxDecoration(
+        //             color: Colors.red,
+        //             borderRadius: BorderRadius.circular(6),
+        //           ),
+        //           constraints: const BoxConstraints(
+        //             minWidth: 12,
+        //             minHeight: 12,
+        //           ),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        //   onPressed: () {
+        //     // TODO: Navigate to notifications
+        //   },
+        // ),
 
         // Profile Avatar
         Obx(() {
