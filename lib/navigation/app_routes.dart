@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:recipe_book/navigation/auth_middleware.dart';
 import 'package:recipe_book/pages/all_categories_page/view/all_categories_page.dart';
 import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
+import 'package:recipe_book/pages/all_favourites_page/view/all_favourites_page.dart';
 import 'package:recipe_book/pages/category_page/view/category_view_page.dart';
 import 'package:recipe_book/pages/home_page/view/home_page.dart';
 import 'package:recipe_book/pages/profile_page/edit_profile_page.dart';
@@ -24,8 +25,9 @@ class AppRoutes {
   static const String allCategories = '/all-categories';
   static const String category = '/category';
   static const String recipe = '/recipe';
-   static const String profile = '/profile';
+  static const String profile = '/profile';
   static const String editProfile = '/edit-profile';
+  static const String allFavourites = '/all-favourites';
 
   // Initial route
   static const String initial = splash;
@@ -113,6 +115,13 @@ class AppPages {
     GetPage(
       name: AppRoutes.editProfile,
       page: () => const EditProfilePage(),
+      transition: Transition.rightToLeft,
+      middlewares: [AuthMiddleware()],
+    ),
+
+      GetPage(
+      name: AppRoutes.allFavourites,
+      page: () => const AllFavouritesPage(),
       transition: Transition.rightToLeft,
       middlewares: [AuthMiddleware()],
     ),

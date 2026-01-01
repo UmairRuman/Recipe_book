@@ -1,7 +1,10 @@
+// lib/pages/home_page/widgets/fav_list.dart
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:recipe_book/navigation/app_routes.dart';
 import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
 import 'package:recipe_book/services/database_services/meal.dart';
 
@@ -48,16 +51,45 @@ class FavouriteReciepeList extends StatelessWidget {
                       ],
                     ),
                     if (favMeals.isNotEmpty)
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to all favourites
-                        },
-                        child: Text(
-                          'See All',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            Get.toNamed(AppRoutes.allFavourites);
+                          },
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF6B6B).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: const Color(0xFFFF6B6B).withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'See All',
+                                  style: TextStyle(
+                                    color: Color(0xFFFF6B6B),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(width: 4),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 12,
+                                  color: Color(0xFFFF6B6B),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

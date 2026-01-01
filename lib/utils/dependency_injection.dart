@@ -5,6 +5,7 @@ import 'package:recipe_book/ai_services/gemini_ai_service.dart';
 import 'package:recipe_book/controllers/ai_controller.dart';
 import 'package:recipe_book/controllers/profile_controller.dart';
 import 'package:recipe_book/pages/all_categories_page/controller/all_categories_controller.dart';
+import 'package:recipe_book/pages/all_favourites_page/controller/all_favourites_controller.dart';
 import 'package:recipe_book/pages/category_page/controller/category_controller.dart';
 import 'package:recipe_book/pages/recipe_page/controller/recipe_controller.dart';
 import 'package:recipe_book/profile_services/profile_service.dart';
@@ -70,10 +71,10 @@ class DependencyInjection {
     // All Categories Controller - used in AllCategoriesPage
     Get.lazyPut(() => AllCategoriesController(), fenix: true);
     
-    // Note: HomePageController is initialized separately in main.dart
-    // because it requires LocalNotificationService's selectedNotificationStream
-
-      // All Favourites Controller - used in AllFavouritesPage
-    // Get.lazyPut(() => AllFavouritesController(), fenix: true);
+  
+    Get.lazyPut<AllFavouritesController>(
+      () => AllFavouritesController(),
+      fenix: true,
+    );
   }
 }
