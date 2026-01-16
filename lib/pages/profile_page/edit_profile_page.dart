@@ -372,6 +372,9 @@ class EditProfilePage extends StatelessWidget {
       activityLevel: activityLevel,
       goal: goal,
     );
+    ScaffoldMessenger.of(Get.context!).showSnackBar(
+      const SnackBar(content: Text('Profile updated successfully')),
+    );
 
     Get.back();
   }

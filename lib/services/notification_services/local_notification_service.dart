@@ -149,57 +149,69 @@ class LocalNotificationService {
 
   /// Determine initial route based on notification and auth state
   /// Returns the route name instead of Widget for better separation of concerns
-  Future<String> getInitialRoute() async {
-    try {
-      // Check if app was launched from notification
-      final NotificationAppLaunchDetails? appLaunchDetails =
-          await _flutterLocalNotificationsPlugin
-              .getNotificationAppLaunchDetails();
+Future<String?> getNotificationLaunchInfo() async {
+  try {
+    final NotificationAppLaunchDetails? appLaunchDetails =
+        await _flutterLocalNotificationsPlugin
+            .getNotificationAppLaunchDetails();
 
-      if (appLaunchDetails?.didNotificationLaunchApp ?? false) {
-        // App was opened from notification
-        final payload = appLaunchDetails!.notificationResponse!.payload;
-        if (payload != null) {
-          log('📱 App opened from notification with payload');
-          // Store payload for later use in RecipePage
-          selectedNotificationStream.add(payload);
-          
-          // Check if user is logged in
-          final storageService = Get.find<SecureStorageService>();
-          final isLoggedIn = await storageService.isLoggedIn();
-          
-          if (isLoggedIn) {
-            // Navigate to recipe page if logged in
-            return AppRoutes.recipe;
-          } else {
-            // Navigate to auth if not logged in
-            return AppRoutes.auth;
-          }
+    if (appLaunchDetails?.didNotificationLaunchApp ?? false) {
+      final payload = appLaunchDetails!.notificationResponse?.payload;
+      if (payload != null) {
+        log('📱 App opened from notification with payload');
+        return payload;
+      }
+    }
+    return null;
+  } catch (e) {
+    log('⚠️ Error getting notification launch info: $e');
+    return null;
+  }
+}
+
+// Keep the old method for backward compatibility but mark as deprecated
+@Deprecated('Use getNotificationLaunchInfo() instead')
+Future<String> getInitialRoute() async {
+  try {
+    final NotificationAppLaunchDetails? appLaunchDetails =
+        await _flutterLocalNotificationsPlugin
+            .getNotificationAppLaunchDetails();
+
+    if (appLaunchDetails?.didNotificationLaunchApp ?? false) {
+      final payload = appLaunchDetails!.notificationResponse!.payload;
+      if (payload != null) {
+        log('📱 App opened from notification with payload');
+        selectedNotificationStream.add(payload);
+        
+        final storageService = Get.find<SecureStorageService>();
+        final isLoggedIn = await storageService.isLoggedIn();
+        
+        if (isLoggedIn) {
+          return AppRoutes.recipe;
+        } else {
+          return AppRoutes.auth;
         }
       }
+    }
 
-      // Normal app launch - check auth state
-      final storageService = Get.find<SecureStorageService>();
-      final isLoggedIn = await storageService.isLoggedIn();
+    final storageService = Get.find<SecureStorageService>();
+    final isLoggedIn = await storageService.isLoggedIn();
 
-      log('🔐 User login status: $isLoggedIn');
+    log('🔐 User login status: $isLoggedIn');
 
-      if (isLoggedIn) {
-        // User is logged in, go to home
-        return AppRoutes.home;
-      } else {
-        // User is not logged in, go to auth
-        return AppRoutes.auth;
-      }
-    } catch (e) {
-      log('⚠️ Error determining initial route: $e');
-      // Default to auth on error
+    if (isLoggedIn) {
+      return AppRoutes.home;
+    } else {
       return AppRoutes.auth;
     }
+  } catch (e) {
+    log('⚠️ Error determining initial route: $e');
+    return AppRoutes.auth;
   }
+}
 
-  void _ondidRecieveNotificationHandler(NotificationResponse details) {
-    details.payload!.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
-    selectedNotificationStream.add(details.payload);
-  }
+void _ondidRecieveNotificationHandler(NotificationResponse details) {
+  details.payload!.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
+  selectedNotificationStream.add(details.payload);
+}
 }

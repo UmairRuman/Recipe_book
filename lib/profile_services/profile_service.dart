@@ -385,21 +385,91 @@ class ProfileService extends GetxService {
   }
 
   /// Get profile completion percentage
-  int getProfileCompletionPercentage(UserProfile profile) {
-    int completed = 0;
-    const int total = 10;
+ // lib/profile_services/profile_service.dart
 
-    if (profile.displayName != null && profile.displayName!.isNotEmpty) completed++;
-    if (profile.age != null) completed++;
-    if (profile.gender != null) completed++;
-    if (profile.height != null && profile.weight != null) completed++;
-    if (profile.healthConditions.isNotEmpty) completed++;
-    if (profile.allergies.isNotEmpty || profile.dietaryRestrictions.isNotEmpty) completed++;
-    if (profile.activityLevel != null) completed++;
-    if (profile.goal != null) completed++;
-    if (profile.cuisinePreferences.isNotEmpty) completed++;
-    if (profile.photoUrl != null && profile.photoUrl!.isNotEmpty) completed++;
+/// Calculate profile completion percentage
+int getProfileCompletionPercentage(UserProfile profile) {
+  int totalFields = 15; // Total important fields
+  int completedFields = 0;
 
-    return ((completed / total) * 100).round();
+  debugPrint('📊 Calculating profile completion...');
+
+  // Basic Info (4 fields) - 26.67%
+  if (profile.displayName != null && profile.displayName!.trim().isNotEmpty) {
+    completedFields++;
+    debugPrint('   ✅ Display Name');
   }
-}
+  if (profile.email != null && profile.email!.trim().isNotEmpty) {
+    completedFields++;
+    debugPrint('   ✅ Email');
+  }
+  if (profile.age != null && profile.age! > 0) {
+    completedFields++;
+    debugPrint('   ✅ Age: ${profile.age}');
+  }
+  if (profile.gender != null && profile.gender!.isNotEmpty) {
+    completedFields++;
+    debugPrint('   ✅ Gender: ${profile.gender}');
+  }
+
+  // Physical Info (2 fields) - 13.33%
+  if (profile.height != null && profile.height! > 0) {
+    completedFields++;
+    debugPrint('   ✅ Height: ${profile.height}');
+  }
+  if (profile.weight != null && profile.weight! > 0) {
+    completedFields++;
+    debugPrint('   ✅ Weight: ${profile.weight}');
+  }
+
+  // Health & Lifestyle (3 fields) - 20%
+  if (profile.activityLevel != null && profile.activityLevel!.isNotEmpty) {
+    completedFields++;
+    debugPrint('   ✅ Activity Level: ${profile.activityLevel}');
+  }
+  if (profile.goal != null && profile.goal!.isNotEmpty) {
+    completedFields++;
+    debugPrint('   ✅ Goal: ${profile.goal}');
+  }
+  if (profile.healthConditions.isNotEmpty) {
+    completedFields++;
+    debugPrint('   ✅ Health Conditions: ${profile.healthConditions.length}');
+  }
+
+  // Dietary Info (3 fields) - 20%
+  if (profile.allergies.isNotEmpty) {
+    completedFields++;
+    debugPrint('   ✅ Allergies: ${profile.allergies.length}');
+  }
+  if (profile.dietaryRestrictions.isNotEmpty) {
+    completedFields++;
+    debugPrint('   ✅ Dietary Restrictions: ${profile.dietaryRestrictions.length}');
+  }
+  if (profile.cuisinePreferences.isNotEmpty) {
+    completedFields++;
+    debugPrint('   ✅ Cuisine Preferences: ${profile.cuisinePreferences.length}');
+  }
+
+  // Preferences (3 fields) - 20%
+  if (profile.dislikedIngredients.isNotEmpty) {
+    completedFields++;
+    debugPrint('   ✅ Disliked Ingredients: ${profile.dislikedIngredients.length}');
+  }
+  
+  // These are always true when profile exists
+  completedFields++; // enableAIRecommendations
+  debugPrint('   ✅ AI Recommendations: ${profile.enableAIRecommendations}');
+  
+  completedFields++; // enableNotifications
+  debugPrint('   ✅ Notifications: ${profile.enableNotifications}');
+
+  final percentage = ((completedFields / totalFields) * 100).round();
+  
+  debugPrint('');
+  debugPrint('📊 Profile Completion Summary:');
+  debugPrint('   Completed: $completedFields / $totalFields fields');
+  debugPrint('   Percentage: $percentage%');
+  debugPrint('');
+
+  return percentage;
+}}

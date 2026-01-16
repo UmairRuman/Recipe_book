@@ -29,9 +29,19 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadProfile();
+   debugPrint('📋 ProfileController initialized');
   }
 
+
+// Add this method to be called when ProfilePage is opened
+@override
+void onReady() {
+  super.onReady();
+  // Only load if user is authenticated and profile not loaded yet
+  if (_authService.isAuthenticated && userProfile.value == null) {
+    loadProfile();
+  }
+}
   @override
   void onClose() {
     displayNameController.dispose();
@@ -405,15 +415,18 @@ class ProfileController extends GetxController {
 
   /// Calculate profile completion percentage
   void _calculateCompletion() {
-    if (userProfile.value == null) {
-      profileCompletion.value = 0;
-      return;
-    }
-
-    profileCompletion.value = _profileService.getProfileCompletionPercentage(
-      userProfile.value!,
-    );
+  if (userProfile.value == null) {
+    profileCompletion.value = 0;
+    return;
   }
+
+  final completion = _profileService.getProfileCompletionPercentage(
+    userProfile.value!,
+  );
+  
+  profileCompletion.value = completion;
+  debugPrint('🎯 Profile completion updated: $completion%');
+}
 
   /// Show success message
   void _showSuccess(String message) {

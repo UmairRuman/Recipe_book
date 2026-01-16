@@ -19,7 +19,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-    // Load the .env file
+  // Load the .env file
   await dotenv.load(fileName: ".env");
 
   // ==================== Initialize Timezones ====================
@@ -30,29 +30,32 @@ void main() async {
   await localNotifications.initializeNotifications();
 
   // ==================== Dependency Injection ====================
-  // Initialize all services and controllers (includes AuthService and SecureStorage)
   await DependencyInjection.init();
 
-  // Initialize HomePageController separately (needs notification stream)
+  // Initialize HomePageController separately
   Get.put(
     HomePageController(
       selectedNotificationStream: localNotifications.selectedNotificationStream,
     ),
   );
 
-  // ==================== Determine Initial Route ====================
-  // Check if user is logged in and if app was opened from notification
-  final String initialRoute = await localNotifications.getInitialRoute();
+  // ==================== Check Notification Launch ====================
+  // Store notification launch info but don't navigate yet
+  final notificationLaunchInfo = await localNotifications.getNotificationLaunchInfo();
+  
+  if (notificationLaunchInfo != null) {
+    debugPrint('📱 App launched from notification with payload: $notificationLaunchInfo');
+    // Store for later use after splash
+    Get.put(notificationLaunchInfo, tag: 'notification_payload');
+  }
 
-  debugPrint('🚀 App starting with initial route: $initialRoute');
+  debugPrint('🚀 App starting with splash screen');
 
-  runApp(MyApp(initialRoute: initialRoute));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.initialRoute});
-  
-  final String initialRoute;
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +77,8 @@ class MyApp extends StatelessWidget {
       ),
       
       // ==================== Routes ====================
-      initialRoute: initialRoute, // Dynamic initial route based on auth state
-      getPages: AppPages.pages,   // All routes with middleware
+      initialRoute: AppRoutes.initial, // ALWAYS start with splash
+      getPages: AppPages.pages,
       
       // ==================== Default Transition ====================
       defaultTransition: Transition.fadeIn,

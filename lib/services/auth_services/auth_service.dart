@@ -1,8 +1,11 @@
 // lib/services/auth_services/auth_service.dart
 
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:recipe_book/controllers/profile_controller.dart';
 import 'package:recipe_book/models/user_model.dart';
 import 'package:recipe_book/services/auth_services/secure_storage_service.dart';
 import 'auth_exceptions.dart';
@@ -89,6 +92,7 @@ class AuthService extends GetxService {
       await _secureStorage.setLoginStatus(true);
       
       _currentUser.value = user;
+      
       return user;
       
     } on FirebaseAuthException catch (e) {
@@ -130,6 +134,16 @@ class AuthService extends GetxService {
       }
       
       _currentUser.value = user;
+      // ✅ Load user profile after login
+    try {
+      final profileController = Get.find<ProfileController>();
+      await profileController.loadProfile();
+      log('✅ User profile loaded after login');
+    } catch (e) {
+      log('⚠️ Profile controller not found or error loading profile: $e');
+    }
+
+    log('✅ User data saved successfully');
       return user;
       
     } on FirebaseAuthException catch (e) {
@@ -147,9 +161,11 @@ class AuthService extends GetxService {
   /// Sign in with Google
   Future<UserModel> signInWithGoogle() async {
     try {
+        await GoogleSignIn.instance.initialize(
+      serverClientId: '79731680133-3nkbm6bcc6o3vbng3meptnrpmqlhtsgq.apps.googleusercontent.com',
+    );
       // Trigger the Google Sign-In flow (request email/profile scopes)
-      final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
-        scopeHint: ['email', 'profile'],
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate(
       );
       
       if (googleUser == null) {
@@ -160,7 +176,7 @@ class AuthService extends GetxService {
       }
 
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =  googleUser.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -183,12 +199,24 @@ class AuthService extends GetxService {
       }
       
       _currentUser.value = user;
+       // ✅ Load user profile after login
+    try {
+      final profileController = Get.find<ProfileController>();
+      await profileController.loadProfile();
+      log('✅ User profile loaded after Google login');
+    } catch (e) {
+      log('⚠️ Error loading profile: $e');
+    }
+
+    log('✅ User data saved successfully');
       return user;
       
     } on FirebaseAuthException catch (e) {
+      log('Google Sign-In Error: ${e.code}');
       await _googleSignIn.signOut(); // Clean up
       throw AuthException.fromCode(e.code);
     } catch (e) {
+       log('Google Sign-In Error: ${e.toString()}');
       await _googleSignIn.signOut(); // Clean up
       throw AuthException(
         code: 'google-signin-failed',
@@ -225,6 +253,16 @@ class AuthService extends GetxService {
       }
       
       _currentUser.value = user;
+       // ✅ Load user profile after login
+    try {
+      final profileController = Get.find<ProfileController>();
+      await profileController.loadProfile();
+      log('✅ User profile loaded after GitHub login');
+    } catch (e) {
+      log('⚠️ Error loading profile: $e');
+    }
+
+    log('✅ User data saved successfully');
       return user;
       
     } on FirebaseAuthException catch (e) {

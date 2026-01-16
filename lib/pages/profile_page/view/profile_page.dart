@@ -19,6 +19,12 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final profileController = Get.find<ProfileController>();
     final authController = Get.find<AuthController>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (profileController.userProfile.value == null && 
+          !profileController.isLoading.value) {
+        profileController.loadProfile();
+      }
+    });
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),

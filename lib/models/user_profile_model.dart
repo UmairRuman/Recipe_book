@@ -248,6 +248,41 @@ class UserProfile {
     );
   }
 
+  // lib/models/user_profile_model.dart
+
+/// Calculate profile completion percentage
+int get completionPercentage {
+  int totalFields = 15;
+  int completedFields = 0;
+
+  // Basic Info (4)
+  if (displayName?.trim().isNotEmpty ?? false) completedFields++;
+  if (email?.trim().isNotEmpty ?? false) completedFields++;
+  if (age != null && age! > 0) completedFields++;
+  if (gender?.isNotEmpty ?? false) completedFields++;
+
+  // Physical (2)
+  if (height != null && height! > 0) completedFields++;
+  if (weight != null && weight! > 0) completedFields++;
+
+  // Health & Lifestyle (3)
+  if (activityLevel?.isNotEmpty ?? false) completedFields++;
+  if (goal?.isNotEmpty ?? false) completedFields++;
+  if (healthConditions.isNotEmpty) completedFields++;
+
+  // Dietary (3)
+  if (allergies.isNotEmpty) completedFields++;
+  if (dietaryRestrictions.isNotEmpty) completedFields++;
+  if (cuisinePreferences.isNotEmpty) completedFields++;
+
+  // Preferences (3)
+  if (dislikedIngredients.isNotEmpty) completedFields++;
+  completedFields++; // enableAIRecommendations
+  completedFields++; // enableNotifications
+
+  return ((completedFields / totalFields) * 100).round();
+}
+
   @override
   String toString() {
     return 'UserProfile(userId: $userId, displayName: $displayName, conditions: ${healthConditions.length})';

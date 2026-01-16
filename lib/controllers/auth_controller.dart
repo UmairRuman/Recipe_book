@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/models/user_model.dart';
+import 'package:recipe_book/navigation/app_routes.dart';
 import 'package:recipe_book/services/auth_services/auth_exceptions.dart';
 import 'package:recipe_book/services/auth_services/auth_service.dart';
 import 'package:recipe_book/services/auth_services/secure_storage_service.dart';
@@ -309,46 +310,113 @@ class AuthController extends GetxController {
   // ==================== Sign Out ====================
 
   /// Handle logout
-  Future<void> logout() async {
+  // lib/controllers/auth_controller.dart
+
+// lib/controllers/auth_controller.dart
+
+// lib/controllers/auth_controller.dart
+
+Future<void> logout() async {
+  try {
+    // Show confirmation dialog
+    final confirm = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
     try {
-      // Show confirmation dialog
-      final confirm = await Get.dialog<bool>(
-        AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure you want to logout?'),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(result: false),
-              child: const Text('Cancel'),
+      // Show loading overlay (non-reactive)
+      Get.dialog(
+        WillPopScope(
+          onWillPop: () async => false, // Prevent dismissing
+          child: const Center(
+            child: Card(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Logging out...'),
+                  ],
+                ),
+              ),
             ),
-            TextButton(
-              onPressed: () => Get.back(result: true),
-              child: const Text('Logout'),
-            ),
-          ],
+          ),
         ),
+        barrierDismissible: false,
       );
 
-      if (confirm != true) return;
-
-      isLoading.value = true;
-
+      // Perform logout
       await _authService.signOut();
+      
+      // IMPORTANT: Clear user BEFORE closing dialog
       currentUser.value = null;
 
-      _showSnackBar('Logged Out', 'You have been successfully logged out');
+      // Close loading dialog
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
 
-      // Navigate to auth page
-      Get.offAllNamed('/auth');
+      // IMPORTANT: Navigate FIRST, THEN show snackbar
+      // This ensures navigation completes before trying to show snackbar
+      await Get.offAllNamed(AppRoutes.splash); // Go to splash, which will redirect to auth
+
+      // Small delay to ensure navigation is complete
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // Now show snackbar on the new page
+      Get.snackbar(
+        'Logged Out',
+        'You have been successfully logged out',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.shade400,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(10),
+        borderRadius: 10,
+      );
       
-    } on AuthException catch (e) {
-      _showSnackBar('Logout Failed', e.message, isError: true);
     } catch (e) {
-      _showSnackBar('Error', 'An unexpected error occurred', isError: true);
-    } finally {
-      isLoading.value = false;
+      // Close loading dialog if error occurs
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      
+      debugPrint('Logout error: $e');
+      
+      // Show error (controller is still alive here)
+      Get.snackbar(
+        'Logout Failed',
+        e is AuthException ? e.message : 'An unexpected error occurred',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 3),
+        margin: const EdgeInsets.all(10),
+        borderRadius: 10,
+      );
     }
+  } catch (e) {
+    debugPrint('Logout dialog error: $e');
   }
+}
 
   // ==================== UI Helper Methods ====================
 

@@ -46,8 +46,8 @@ class AppPages {
           page: () => const SplashScreen(),
           transition: Transition.fade,
           transitionDuration: const Duration(milliseconds: 300),
+          // NO middlewares here!
         ),
-
         // Authentication Page - Only accessible when NOT logged in
         GetPage(
           name: AppRoutes.auth,

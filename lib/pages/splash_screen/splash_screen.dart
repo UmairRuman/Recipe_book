@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:recipe_book/navigation/app_routes.dart';
 import 'package:recipe_book/pages/Authentication_pages/main_auth_page.dart';
+import 'package:recipe_book/pages/home_page/controller/home_page_controller.dart';
 import 'package:recipe_book/pages/home_page/view/home_page.dart';
+import 'package:recipe_book/services/auth_services/auth_service.dart';
 import 'package:recipe_book/services/auth_services/secure_storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -45,6 +47,7 @@ class _SplashScreenState extends State<SplashScreen>
     "Almost ready to cook!",
   ];
   int _messageIndex = 0;
+  bool _hasNavigated = false; // Prevent multiple navigations
 
   @override
   void initState() {
@@ -127,72 +130,125 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-  void _startAnimationSequence() async {
-    // Start background fade
-    _fadeController.forward();
+   void _startAnimationSequence() async {
+    try {
+      // Start background fade
+      _fadeController.forward();
 
-    // Delay then start logo animations
-    await Future.delayed(const Duration(milliseconds: 500));
-    _scaleController.forward();
-    _rotationController.repeat();
+      // Delay then start logo animations
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!mounted) return;
+      
+      _scaleController.forward();
+      _rotationController.repeat();
 
-    // Start particle animation
-    _particleController.repeat();
+      // Start particle animation
+      _particleController.repeat();
 
-    // Delay then start title slide
-    await Future.delayed(const Duration(milliseconds: 800));
-    _slideController.forward();
+      // Delay then start title slide
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (!mounted) return;
+      
+      _slideController.forward();
 
-    // Start progress and text animations
-    await Future.delayed(const Duration(milliseconds: 500));
-    _progressController.forward();
-    _textController.forward();
+      // Start progress and text animations
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!mounted) return;
+      
+      _progressController.forward();
+      _textController.forward();
 
-    // Cycle through loading messages
-    _cycleLoadingMessages();
+      // Cycle through loading messages
+      _cycleLoadingMessages();
 
-    // Navigate to home after animations
-    await Future.delayed(const Duration(seconds: 4));
-    _navigateToNextScreen();
+      // Navigate after ALL animations complete (3.5 seconds total)
+      await Future.delayed(const Duration(milliseconds: 3500));
+      if (!mounted || _hasNavigated) return;
+      
+      await _navigateToNextScreen();
+    } catch (e) {
+      debugPrint('❌ Animation sequence error: $e');
+      // Fallback navigation on error
+      if (mounted && !_hasNavigated) {
+        _navigateToNextScreen();
+      }
+    }
   }
 
   void _cycleLoadingMessages() async {
-    for (int i = 1; i < _loadingMessages.length; i++) {
-      await Future.delayed(const Duration(milliseconds: 800));
-      if (mounted) {
+    try {
+      for (int i = 1; i < _loadingMessages.length; i++) {
+        await Future.delayed(const Duration(milliseconds: 800));
+        if (!mounted || _hasNavigated) return;
+        
         setState(() {
           _messageIndex = i;
           _loadingText = _loadingMessages[i];
         });
+        
         _textController.reset();
         _textController.forward();
       }
-    }
-  }
-
-   Future<void> _navigateToNextScreen() async {
-     // Wait for splash animation
-    await Future.delayed(const Duration(seconds: 3));
-
-    try {
-      // Check if user is logged in
-      final storageService = Get.find<SecureStorageService>();
-      final isLoggedIn = await storageService.isLoggedIn();
-
-      debugPrint('🔐 Splash: User logged in = $isLoggedIn');
-
-      // Navigate based on login status
-      if (isLoggedIn) {
-        Get.offAllNamed(AppRoutes.home);
-      } else {
-        Get.offAllNamed(AppRoutes.auth);
-      }
     } catch (e) {
-      debugPrint('⚠️ Error checking login status: $e');
-      // Default to auth on error
-      Get.offAllNamed(AppRoutes.auth);
+      debugPrint('❌ Message cycle error: $e');
     }
   }
+
+  // lib/pages/splash_screen/splash_screen.dart
+
+Future<void> _navigateToNextScreen() async {
+  if (_hasNavigated) {
+    debugPrint('⚠️ Already navigated, skipping...');
+    return;
+  }
+
+  _hasNavigated = true;
+  debugPrint('🚀 Navigating from splash screen...');
+
+  try {
+    final authService = Get.find<AuthService>();
+    final isAuthenticated = authService.isAuthenticated;
+
+    debugPrint('🔐 Is Authenticated: $isAuthenticated');
+
+    if (!mounted) return;
+
+    // Check if app was launched from notification
+    String? notificationPayload;
+    try {
+      notificationPayload = Get.find<String>(tag: 'notification_payload');
+      debugPrint('📱 Found notification payload: $notificationPayload');
+    } catch (e) {
+      // No notification payload
+    }
+
+    // Navigate based on authentication and notification
+    if (notificationPayload != null && isAuthenticated) {
+      // App opened from notification and user is logged in
+      debugPrint('✅ Navigating to Recipe from notification');
+      
+      // Add payload to stream for RecipePage
+      final homeController = Get.find<HomePageController>();
+      homeController.selectedNotificationStream.add(notificationPayload);
+      
+      // Navigate to recipe page
+      await Get.offAllNamed(AppRoutes.recipe);
+    } else if (isAuthenticated) {
+      // Normal launch, user logged in
+      debugPrint('✅ Navigating to Home');
+      await Get.offAllNamed(AppRoutes.home);
+    } else {
+      // User not logged in
+      debugPrint('✅ Navigating to Auth');
+      await Get.offAllNamed(AppRoutes.auth);
+    }
+  } catch (e) {
+    debugPrint('⚠️ Splash: Navigation error: $e');
+    if (mounted) {
+      await Get.offAllNamed(AppRoutes.auth);
+    }
+  }
+}
 
   @override
   void dispose() {
