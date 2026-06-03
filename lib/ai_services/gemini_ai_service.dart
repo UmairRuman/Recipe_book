@@ -14,7 +14,7 @@ class GeminiAIService extends GetxService {
 
   late final GenerativeModel _nutritionModel;
   late final GenerativeModel _healthModel;
-  
+
   // Load API key from environment variables
   late final String _apiKey;
 
@@ -28,7 +28,7 @@ class GeminiAIService extends GetxService {
   /// Load API key from .env file
   void _loadApiKey() {
     _apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
-    
+
     if (_apiKey.isEmpty) {
       log('❌ ERROR: GEMINI_API_KEY not found in .env file!');
       log('   Please add your API key to the .env file');
@@ -48,13 +48,13 @@ class GeminiAIService extends GetxService {
     try {
       // Initialize nutrition analysis model
       _nutritionModel = GenerativeModel(
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash',
         apiKey: _apiKey,
         generationConfig: GenerationConfig(
           temperature: 0.1, // Very low for consistent JSON
           topK: 1,
           topP: 0.95,
-          maxOutputTokens: 10000, // Maximum tokens for complete response
+          maxOutputTokens: 20000, // Maximum tokens for complete response
           responseMimeType: 'application/json', // Request JSON format
         ),
         systemInstruction: Content.system(AIPrompts.nutritionSystemRole),
@@ -62,13 +62,13 @@ class GeminiAIService extends GetxService {
 
       // Initialize health recommendation model
       _healthModel = GenerativeModel(
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash',
         apiKey: _apiKey,
         generationConfig: GenerationConfig(
           temperature: 0.2,
           topK: 1,
           topP: 0.95,
-          maxOutputTokens: 10000,
+          maxOutputTokens: 20000,
           responseMimeType: 'application/json', // Request JSON format
         ),
         systemInstruction: Content.system(AIPrompts.healthSystemRole),
@@ -117,14 +117,14 @@ class GeminiAIService extends GetxService {
 
       // Extract and parse JSON
       final jsonData = _extractAndParseJson(response.text!);
-      
+
       if (jsonData == null) {
         log('❌ Failed to extract valid JSON from response');
         return null;
       }
 
       final nutritionData = NutritionData.fromJson(jsonData);
-      
+
       log('✅ AI: Successfully parsed nutrition data');
       log('   Calories: ${nutritionData.caloriesPerServing}');
       log('   Health Score: ${nutritionData.healthScore}');
@@ -179,14 +179,14 @@ class GeminiAIService extends GetxService {
 
       // Extract and parse JSON
       final jsonData = _extractAndParseJson(response.text!);
-      
+
       if (jsonData == null) {
         log('❌ Failed to extract valid JSON from response');
         return null;
       }
 
       final recommendation = HealthRecommendation.fromJson(jsonData);
-      
+
       log('✅ AI: Successfully parsed health recommendations');
       log('   Overall Rating: ${recommendation.overallRating}');
       log('   Suitable: ${recommendation.recommendations.suitable}');
@@ -213,35 +213,36 @@ class GeminiAIService extends GetxService {
 
       // Remove markdown code blocks
       String cleaned = response.trim();
-      
+
       // Remove all variations of code blocks
       cleaned = cleaned.replaceAll(RegExp(r'```json\s*'), '');
       cleaned = cleaned.replaceAll(RegExp(r'```\s*'), '');
       cleaned = cleaned.replaceAll('```', '');
       cleaned = cleaned.trim();
-      
+
       // Find JSON object boundaries
       final startIndex = cleaned.indexOf('{');
       final endIndex = cleaned.lastIndexOf('}');
-      
+
       if (startIndex == -1 || endIndex == -1) {
         log('⚠️ No JSON object found in response');
-        log('   Response starts with: ${cleaned.substring(0, cleaned.length > 50 ? 50 : cleaned.length)}');
+        log(
+          '   Response starts with: ${cleaned.substring(0, cleaned.length > 50 ? 50 : cleaned.length)}',
+        );
         return null;
       }
-      
+
       // Extract JSON
       cleaned = cleaned.substring(startIndex, endIndex + 1);
-      
+
       // Validate balanced braces
       if (!_isValidJson(cleaned)) {
         log('⚠️ Invalid JSON structure detected');
         return null;
       }
-      
+
       // Parse JSON
       return jsonDecode(cleaned) as Map<String, dynamic>;
-      
     } catch (e) {
       log('❌ Error extracting/parsing JSON: $e');
       return null;
@@ -252,7 +253,7 @@ class GeminiAIService extends GetxService {
   bool _isValidJson(String json) {
     int braceCount = 0;
     int bracketCount = 0;
-    
+
     for (int i = 0; i < json.length; i++) {
       switch (json[i]) {
         case '{':
@@ -268,13 +269,13 @@ class GeminiAIService extends GetxService {
           bracketCount--;
           break;
       }
-      
+
       // If counts go negative, invalid structure
       if (braceCount < 0 || bracketCount < 0) {
         return false;
       }
     }
-    
+
     // All brackets must be balanced
     return braceCount == 0 && bracketCount == 0;
   }
@@ -296,16 +297,16 @@ class GeminiAIService extends GetxService {
       final response = await _nutritionModel.generateContent([
         Content.text('Return only the word "OK"'),
       ]);
-      
+
       final text = response.text?.trim() ?? '';
       final isOk = text.contains('OK');
-      
+
       if (isOk) {
         log('✅ AI Connection test successful');
       } else {
         log('⚠️ AI Connection test failed - Response: $text');
       }
-      
+
       return isOk;
     } catch (e) {
       log('❌ AI: Connection test failed: $e');
@@ -352,18 +353,15 @@ class GeminiAIService extends GetxService {
   void clearCache() {
     final nutritionCount = _nutritionCache.length;
     final healthCount = _healthCache.length;
-    
+
     _nutritionCache.clear();
     _healthCache.clear();
-    
+
     log('🗑️ Cleared cache: $nutritionCount nutrition, $healthCount health');
   }
 
   /// Get cache statistics
   Map<String, int> getCacheStats() {
-    return {
-      'nutrition': _nutritionCache.length,
-      'health': _healthCache.length,
-    };
+    return {'nutrition': _nutritionCache.length, 'health': _healthCache.length};
   }
 }
